@@ -3,12 +3,8 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ContentChild,
-  ElementRef,
-  EventEmitter,
   inject,
   OnDestroy,
-  Output,
 } from '@angular/core';
 import { LIB_CONFIG } from './lib-config';
 import {
