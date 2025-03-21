@@ -14,7 +14,7 @@
   --color-text-light: #607d8b;
   --height-header: 64px;
   --height-footer: 48px;
-  --border-radius: 10px;
+  --border-radius: 5px;
   --spacing-step: 8px;
   --font-size-h1: 34px;
 }
@@ -106,7 +106,7 @@ legend {
 input,
 button,
 select {
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   font-size: 18px;
   padding: 10px 11px;
 }

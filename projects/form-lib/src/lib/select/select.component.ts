@@ -1,16 +1,45 @@
-import { animate, AnimationEvent, state, style, transition, trigger } from '@angular/animations';
+import {
+  animate,
+  AnimationEvent,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterContentInit, Attribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  AfterContentInit,
+  Attribute,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ContentChildren,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  QueryList,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 import { merge, startWith, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { OptionComponent } from './option/option.component';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { CommonModule } from '@angular/common';
 
 export type SelectValue<T> = T | T[] | null;
 
 @Component({
   selector: 'cfc-select',
+  standalone: true,
+  imports: [CommonModule, OverlayModule],
   templateUrl: './select.component.html',
   styleUrls: ['./select.component.scss'],
   animations: [
@@ -18,20 +47,23 @@ export type SelectValue<T> = T | T[] | null;
       state('void', style({ transform: 'scaleY(0)', opacity: 0 })),
       state('*', style({ transform: 'scaleY(1)', opacity: 1 })),
       transition(':enter', [animate('320ms cubic-bezier(0, 1, 0.45, 1.34)')]),
-      transition(':leave', [animate('420ms cubic-bezier(0.88,-0.7, 0.86, 0.85)')]),
-    ])
+      transition(':leave', [
+        animate('420ms cubic-bezier(0.88,-0.7, 0.86, 0.85)'),
+      ]),
+    ]),
   ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: SelectComponent,
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestroy, ControlValueAccessor {
-
+export class SelectComponent<T>
+  implements OnChanges, AfterContentInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   label = '';
 
@@ -46,14 +78,14 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
   displayWith: ((value: T) => string | number) | null = null;
 
   @Input()
-  compareWith: ((v1: T | null, v2: T | null) => boolean) = (v1, v2) => v1 === v2;
+  compareWith: (v1: T | null, v2: T | null) => boolean = (v1, v2) => v1 === v2;
 
   @Input()
   set value(value: SelectValue<T>) {
     this.setupValue(value);
     this.onChange(this.value);
     this.highlightSelectedOptions();
-  };
+  }
   get value() {
     if (this.selectionModel.isEmpty()) {
       return null;
@@ -63,7 +95,16 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
     }
     return this.selectionModel.selected[0];
   }
-  private selectionModel = new SelectionModel<T>(coerceBooleanProperty(this.multiple));
+  private _selectionModel: SelectionModel<T>;
+
+  private get selectionModel(): SelectionModel<T> {
+    if (!this._selectionModel) {
+      this._selectionModel = new SelectionModel<T>(
+        coerceBooleanProperty(this.multiple)
+      );
+    }
+    return this._selectionModel;
+  }
 
   @Output()
   readonly opened = new EventEmitter<void>();
@@ -92,7 +133,7 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
     if (this.searchable) {
       setTimeout(() => {
         this.searchInputEl.nativeElement.focus();
-      }, 0);
+      }, 1);
     }
     this.cd.markForCheck();
   }
@@ -152,7 +193,7 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
     @Attribute('multiple') private multiple: string | null,
     private cd: ChangeDetectorRef,
     private hostEl: ElementRef
-  ) { }
+  ) {}
 
   writeValue(value: SelectValue<T>): void {
     this.setupValue(value);
@@ -178,24 +219,34 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
   }
 
   ngAfterContentInit(): void {
-    this.listKeyManager = new ActiveDescendantKeyManager(this.options).withWrap();
-    this.listKeyManager.change.pipe(takeUntil(this.unsubscribe$)).subscribe(itemIndex => {
-      this.options.get(itemIndex)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
+    this.listKeyManager = new ActiveDescendantKeyManager(
+      this.options
+    ).withWrap();
+    this.listKeyManager.change
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((itemIndex) => {
+        this.options.get(itemIndex)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
       });
-    });
-    this.selectionModel.changed.pipe(takeUntil(this.unsubscribe$)).subscribe(values => {
-      values.removed.forEach(rv => this.optionMap.get(rv)?.deselect());
-      values.added.forEach(av => this.optionMap.get(av)?.highlightAsSelected());
-    })
-    this.options.changes.pipe(
-      startWith<QueryList<OptionComponent<T>>>(this.options),
-      tap(() => this.refreshOptionsMap()),
-      tap(() => queueMicrotask(() => this.highlightSelectedOptions())),
-      switchMap(options => merge(...options.map(o => o.selected))),
-      takeUntil(this.unsubscribe$)
-    ).subscribe(selectedOption => this.handleSelection(selectedOption));
+    this.selectionModel.changed
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((values) => {
+        values.removed.forEach((rv) => this.optionMap.get(rv)?.deselect());
+        values.added.forEach((av) =>
+          this.optionMap.get(av)?.highlightAsSelected()
+        );
+      });
+    this.options.changes
+      .pipe(
+        startWith<QueryList<OptionComponent<T>>>(this.options),
+        tap(() => this.refreshOptionsMap()),
+        tap(() => queueMicrotask(() => this.highlightSelectedOptions())),
+        switchMap((options) => merge(...options.map((o) => o.selected))),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((selectedOption) => this.handleSelection(selectedOption));
   }
 
   ngOnDestroy(): void {
@@ -250,14 +301,16 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
 
   private refreshOptionsMap() {
     this.optionMap.clear();
-    this.options.forEach(o => this.optionMap.set(o.value, o));
+    this.options.forEach((o) => this.optionMap.set(o.value, o));
   }
 
   private highlightSelectedOptions() {
-    const valuesWithUpdatedReferences = this.selectionModel.selected.map(value => {
-      const correspondingOption = this.findOptionsByValue(value);
-      return correspondingOption ? correspondingOption.value! : value;
-    });
+    const valuesWithUpdatedReferences = this.selectionModel.selected.map(
+      (value) => {
+        const correspondingOption = this.findOptionsByValue(value);
+        return correspondingOption ? correspondingOption.value! : value;
+      }
+    );
     this.selectionModel.clear();
     this.selectionModel.select(...valuesWithUpdatedReferences);
   }
@@ -266,6 +319,8 @@ export class SelectComponent<T> implements OnChanges, AfterContentInit, OnDestro
     if (this.optionMap.has(value)) {
       return this.optionMap.get(value);
     }
-    return this.options && this.options.find(o => this.compareWith(o.value, value));
+    return (
+      this.options && this.options.find((o) => this.compareWith(o.value, value))
+    );
   }
 }

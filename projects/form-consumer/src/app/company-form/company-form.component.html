@@ -1,2 +1,36 @@
 <p>company-form works!</p>
-<lib-form></lib-form>
+<form [formGroup]="form" (ngSubmit)="onSubmit(form)">
+  <lib-form>
+    <div formGroupName="group" style="display: flex">
+      <input type="text" formControlName="ctrl1" />
+      <cfc-select
+        label="Pick the User"
+        [searchable]="true"
+        [compareWith]="compareWithFn"
+        [displayWith]="displayWithFn"
+        formControlName="ctrl2"
+        (closed)="onSearchChanged('')"
+        (searchChanged)="onSearchChanged($event)"
+      >
+        <cfc-option *ngFor="let user of filteredUsers" [value]="user">{{
+          user.name
+        }}</cfc-option>
+      </cfc-select>
+    </div>
+
+    <cfc-select
+      label="Pick the User"
+      multiple
+      [searchable]="true"
+      [compareWith]="compareWithFn"
+      [displayWith]="displayWithFn"
+      formControlName="selectValue"
+      (closed)="onSearchChanged('')"
+      (searchChanged)="onSearchChanged($event)"
+    >
+      <cfc-option *ngFor="let user of filteredUsers" [value]="user">{{
+        user.name
+      }}</cfc-option>
+    </cfc-select>
+  </lib-form>
+</form>

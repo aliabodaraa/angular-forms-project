@@ -7,3 +7,4 @@ export * from './lib/form-lib.component';
 export * from './lib/lib-config';
 export * from './lib/dynamic-forms';
 export * from './lib/rating-picker';
+export * from './lib/select/index';
