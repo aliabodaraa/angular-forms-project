@@ -1,77 +1,80 @@
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
-  contentChild,
-  ContentChildren,
   ElementRef,
+  EventEmitter,
   inject,
-  QueryList,
-  TemplateRef,
-  Type,
-  ViewChild,
-  ViewChildren,
-  viewChildren,
+  OnDestroy,
+  Output,
 } from '@angular/core';
 import { LIB_CONFIG } from './lib-config';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  ControlContainer,
+  FormGroup,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { DynamicControlResolver } from './dynamic-forms/dynamic-control-resolver.service';
 import { ControlInjectorPipe } from './dynamic-forms/control-injector.pipe';
 import { comparatorFn } from './dynamic-forms/dynamic-controls/base-dynamic-control';
-import { RatingPickerComponent } from './rating-picker';
+import { filter, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'lib-form',
   imports: [CommonModule, ReactiveFormsModule, ControlInjectorPipe],
   template: `
-    <ng-container *ngIf="config$ | async as formConfig">
-      <div class="dynamic-form-container">
-        <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
-          <h3 class="form-heading">{{ formConfig.description }}</h3>
-          <ng-container
-            *ngFor="
-              let control of formConfig.controls | keyvalue : comparatorFn
-            "
-          >
-            <ng-container
-              [ngComponentOutlet]="
-                controlResolver.resolve(control.value.controlType) | async
-              "
-              [ngComponentOutletInjector]="
-                control.key | controlInjector : control.value
-              "
-            ></ng-container>
-          </ng-container>
-          <ng-content></ng-content>
+    <div
+      *ngIf="form && config$ | async as formConfig"
+      class="dynamic-form-container"
+    >
+      <h3 class="form-heading">{{ formConfig.description }}</h3>
+      <ng-container
+        *ngFor="let control of formConfig.controls | keyvalue : comparatorFn"
+      >
+        <ng-container
+          [ngComponentOutlet]="
+            controlResolver.resolve(control.value.controlType) | async
+          "
+          [ngComponentOutletInjector]="
+            control.key | controlInjector : control.value
+          "
+        ></ng-container>
+      </ng-container>
+      <ng-content></ng-content>
 
-          <button [disabled]="form.invalid">Save</button>
-        </form>
-      </div>
-    </ng-container>
-    {{ form.value | json }}
+      <button [disabled]="form?.invalid">Save</button>
+    </div>
   `,
   styles: ``,
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormLibComponent {
-  public config$ = inject(LIB_CONFIG);
-  public form = new FormGroup({});
+export class FormLibComponent implements OnDestroy {
+  private cdr = inject(ChangeDetectorRef);
+  private destroy$ = new Subject<void>();
   protected controlResolver = inject(DynamicControlResolver);
   protected comparatorFn = comparatorFn;
-  protected onSubmit(form: FormGroup) {
-    console.log('Submitted data: ', form.value);
-    form.reset();
-  }
-  @ContentChild('ratingPicker', { read: ElementRef })
-  ratingPicker: ElementRef;
+  public config$ = inject(LIB_CONFIG);
+  public form = inject(ControlContainer, {
+    optional: true,
+  })?.formDirective as FormGroup | null | undefined;
 
   ngAfterContentInit(): void {
-    if (this.ratingPicker?.nativeElement)
-      this.form.addControl(
-        this.ratingPicker?.nativeElement.getAttribute('formControlName'),
-        new FormControl('')
-      );
+    this.form?.statusChanges
+      ?.pipe(
+        filter((stateVal) => stateVal === 'VALID'),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((stateVal) => {
+        console.log('stateVal', stateVal);
+        this.cdr.detectChanges();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
