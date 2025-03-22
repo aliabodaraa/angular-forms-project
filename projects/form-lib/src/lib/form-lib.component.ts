@@ -5,6 +5,7 @@ import {
   Component,
   inject,
   OnDestroy,
+  OnInit,
 } from '@angular/core';
 import { LIB_CONFIG } from './lib-config';
 import {
@@ -15,7 +16,7 @@ import {
 import { DynamicControlResolver } from './dynamic-forms/dynamic-control-resolver.service';
 import { ControlInjectorPipe } from './dynamic-forms/control-injector.pipe';
 import { comparatorFn } from './dynamic-forms/dynamic-controls/base-dynamic-control';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { bufferCount, filter, Subject, take, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'lib-form',
@@ -38,6 +39,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
           "
         ></ng-container>
       </ng-container>
+
       <div class="extenal-controls">
         <ng-content></ng-content>
       </div>
@@ -57,9 +59,8 @@ import { filter, Subject, takeUntil } from 'rxjs';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FormLibComponent implements OnDestroy {
+export class FormLibComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
-  private destroy$ = new Subject<void>();
   protected controlResolver = inject(DynamicControlResolver);
   protected comparatorFn = comparatorFn;
   public config$ = inject(LIB_CONFIG);
@@ -67,20 +68,19 @@ export class FormLibComponent implements OnDestroy {
     optional: true,
   })?.formDirective as FormGroup | null | undefined;
 
-  ngAfterContentInit(): void {
+  ngOnInit(): void {
     this.form?.statusChanges
       ?.pipe(
-        filter((stateVal) => stateVal === 'VALID'),
-        takeUntil(this.destroy$)
+        bufferCount(2, 1),
+        filter(
+          ([prevState, nextState]) =>
+            prevState === 'INVALID' && nextState === 'VALID'
+        ),
+        take(1)
       )
       .subscribe((stateVal) => {
         console.log('stateVal', stateVal);
         this.cdr.detectChanges();
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
