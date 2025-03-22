@@ -256,6 +256,7 @@ export class SelectComponent<T>
 
   clearSelection(e?: Event) {
     e?.stopPropagation();
+    e?.preventDefault();
     if (this.disabled) return;
     this.selectionModel.clear();
     this.selectionChanged.emit(this.value);
