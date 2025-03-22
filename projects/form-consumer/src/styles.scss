@@ -121,8 +121,8 @@ select {
   border: 2px solid var(--color-success);
 }
 .ng-invalid.ng-dirty:not([ngModelGroup="address"]):not(
-    [formGroupName="address"]
-  ):not([formArrayName]):not(form) {
+    [formGroupName="group"]
+  ):not([formArrayName]):not(form):not([formGroupName="group"]) {
   border: 2px solid var(--color-error);
 }
 

@@ -1,21 +1,36 @@
 <p>company-form works!</p>
 <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
   <lib-form>
-    <div formGroupName="group" style="display: flex">
-      <input type="text" formControlName="ctrl1" />
-      <cfc-select
-        label="Pick the User"
-        [searchable]="true"
-        [compareWith]="compareWithFn"
-        [displayWith]="displayWithFn"
-        formControlName="ctrl2"
-        (closed)="onSearchChanged('')"
-        (searchChanged)="onSearchChanged($event)"
+    <div class="flex" style="display: flex; flex-direction: column; gap: 4px">
+      <div
+        formGroupName="group"
+        style="display: flex; gap: 4px"
+        [container]="containerDir.container"
       >
-        <cfc-option *ngFor="let user of filteredUsers" [value]="user">{{
-          user.name
-        }}</cfc-option>
-      </cfc-select>
+        <input
+          [container]="containerDir.container"
+          type="text"
+          formControlName="ctrl1"
+        />
+        <cfc-select
+          [container]="containerDir.container"
+          label="Pick the User"
+          [searchable]="true"
+          [compareWith]="compareWithFn"
+          [displayWith]="displayWithFn"
+          formControlName="ctrl2"
+          (closed)="onSearchChanged('')"
+          (searchChanged)="onSearchChanged($event)"
+        >
+          <cfc-option *ngFor="let user of filteredUsers" [value]="user">{{
+            user.name
+          }}</cfc-option>
+        </cfc-select>
+      </div>
+      <ng-container
+        validatorMessageContainer
+        #containerDir="validatorMessageContainer"
+      ></ng-container>
     </div>
 
     <cfc-select

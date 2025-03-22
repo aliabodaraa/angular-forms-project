@@ -6,7 +6,10 @@
       "type": "text",
       "label": "Company Name",
       "value": "",
-      "order": 0
+      "order": 0,
+      "validators": {
+        "required": true
+      }
     },
     "phone": {
       "controlType": "input",

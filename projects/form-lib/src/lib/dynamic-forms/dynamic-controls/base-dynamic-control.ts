@@ -18,7 +18,7 @@ import {
 } from '@angular/forms';
 import { CONTROL_DATA } from '../control-data.token';
 import { DynamicControl } from '../dynamic-forms.model';
-import { DynamicValidatorMessage } from '../dynamic-validator-message.directive';
+import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
 import { banWords } from '../validators/ban-words.validator';
 
 export const comparatorFn = (

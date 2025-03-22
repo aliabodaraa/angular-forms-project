@@ -1,11 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  DynamicValidatorMessage,
   FormLibComponent,
   jsonFileProvider,
   OptionComponent,
   SelectComponent,
+  ValidatorMessageContainer,
 } from 'form-lib';
 export class User {
   constructor(
@@ -24,11 +31,16 @@ export class User {
     SelectComponent,
     OptionComponent,
     CommonModule,
+    DynamicValidatorMessage,
+    ValidatorMessageContainer,
   ],
   standalone: true,
   templateUrl: './company-form.component.html',
   styleUrl: './company-form.component.scss',
-  providers: [jsonFileProvider('assets/company.form.json')],
+  providers: [
+    jsonFileProvider('assets/company.form.json'),
+    { provide: DynamicValidatorMessage, useExisting: DynamicValidatorMessage },
+  ],
 })
 export class CompanyFormComponent {
   public form = new FormGroup({
@@ -37,8 +49,10 @@ export class CompanyFormComponent {
       new User(1, 'Albert Einstein', 'albert', 'Germany/USA'),
     ]),
     group: new FormGroup({
-      ctrl1: new FormControl('Ali ctrl1'),
-      ctrl2: new FormControl(new User(2, 'Niels Bohr', 'niels', 'Denmark')),
+      ctrl1: new FormControl('Ali ctrl1', [Validators.required]),
+      ctrl2: new FormControl(new User(2, 'Niels Bohr', 'niels', 'Denmark'), [
+        Validators.required,
+      ]),
     }),
   });
   protected onSubmit(form: FormGroup) {

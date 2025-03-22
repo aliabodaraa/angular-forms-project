@@ -1,13 +1,18 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { VALIDATION_ERROR_MESSAGES } from './input-error/validation-error-messages.token';
+import {
+  ERROR_MESSAGES,
+  VALIDATION_ERROR_MESSAGES,
+} from './validation-error-messages.token';
 
 @Pipe({
   name: 'errorMessage',
-  standalone: true
+  standalone: true,
 })
 export class ErrorMessagePipe implements PipeTransform {
-
-  private errorMessages = inject(VALIDATION_ERROR_MESSAGES);
+  private errorMessages = {
+    ...ERROR_MESSAGES,
+    ...inject(VALIDATION_ERROR_MESSAGES),
+  };
 
   transform(key: string, errValue: any): string {
     if (!this.errorMessages[key]) {
@@ -16,5 +21,4 @@ export class ErrorMessagePipe implements PipeTransform {
     }
     return this.errorMessages[key](errValue);
   }
-
 }
