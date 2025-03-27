@@ -108,14 +108,14 @@ export class DynamicArrayComponent extends BaseDynamicControl {
     this.config_arr.push(mainObh);
   }
   removeItem(index: number) {
-    const copyArr = this.formControl;
-    this.formControl.clear();
+    // const copyArr = this.formControl;
+    // this.formControl.clear();
     this.config_arr.splice(index, 1);
-
-    for (let index = 0; index <= copyArr.length; index++) {
-      if (index >= this.config_arr.length) copyArr.removeAt(index);
-    }
-    this.formControl = copyArr;
+    this.formControl.removeAt(index);
+    // for (let index = 0; index <= copyArr.length; index++) {
+    //   if (index >= this.config_arr.length) copyArr.removeAt(index);
+    // }
+    // this.formControl = copyArr;
   }
   trackByFn(index: number, item: any): any {
     return item.value.order;
