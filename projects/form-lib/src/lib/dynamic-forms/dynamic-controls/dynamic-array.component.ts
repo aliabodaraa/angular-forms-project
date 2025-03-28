@@ -21,6 +21,7 @@ import { ControlInjectorPipe } from '../control-injector.pipe';
   viewProviders: [dynamicControlProvider],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    {{ lastOrder }}
     <fieldset [formArrayName]="control.controlKey">
       <legend>{{ control.config.label }}</legend>
       <button class="add-button" (click)="addItem()" type="button">+</button>
@@ -68,7 +69,18 @@ export class DynamicArrayComponent extends BaseDynamicControl {
   protected comparatorFn = comparatorFn;
   random = Math.random();
   config_arr = this.control.config.controls as any[];
-
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.formControl.valueChanges.subscribe((values) => {
+      console.log(values);
+    });
+  }
+  get lastOrder() {
+    return this.config_arr?.length ? this.config_arr?.length : 0;
+  }
+  set lastOrder(newOrder) {
+    this.lastOrder = newOrder;
+  }
   addItem() {
     let mainObh = {};
     const structure = this.control.config.typingStructureOfArrayChild;
@@ -76,10 +88,10 @@ export class DynamicArrayComponent extends BaseDynamicControl {
       if (ctrlType === 'input') {
         mainObh = {
           controlType: ctrlType,
-          label: `label ${this.formControl.length + 1 || 1}`,
-          value: '',
+          label: `label ${this.lastOrder + 1 || 1}`,
+          value: 9,
           type: structure?.[ctrlType],
-          order: this.formControl?.length || 1,
+          order: ++this.lastOrder,
         };
       } else if (ctrlType === 'group') {
         let ctrls = {};
@@ -98,8 +110,8 @@ export class DynamicArrayComponent extends BaseDynamicControl {
         }
         mainObh = {
           controlType: ctrlType,
-          label: `${ctrlType} ${this.formControl.length + 1 || 1}`,
-          order: this.formControl?.length || 1,
+          label: `${ctrlType} ${this.lastOrder + 1 || 1}`,
+          order: ++this.lastOrder,
           controls: { ...ctrls },
         };
       }
@@ -108,16 +120,13 @@ export class DynamicArrayComponent extends BaseDynamicControl {
     this.config_arr.push(mainObh);
   }
   removeItem(index: number) {
-    // const copyArr = this.formControl;
-    // this.formControl.clear();
     this.config_arr.splice(index, 1);
     this.formControl.removeAt(index);
-    // for (let index = 0; index <= copyArr.length; index++) {
-    //   if (index >= this.config_arr.length) copyArr.removeAt(index);
-    // }
-    // this.formControl = copyArr;
   }
-  trackByFn(index: number, item: any): any {
+  get lengthArr() {
+    return this.formControl.length;
+  }
+  trackByFn(_: number, item: any): number {
     return item.value.order;
   }
 }

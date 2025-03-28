@@ -25,4 +25,9 @@ export class DynamicInputComponent extends BaseDynamicControl {
   constructor() {
     super();
   }
+  get value() {
+    return this.control.config.type === 'number'
+      ? Number(this.control.config.value)
+      : this.control.config.value;
+  }
 }

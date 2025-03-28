@@ -54,7 +54,6 @@ export class BaseDynamicControl implements OnInit {
     try {
       if (this.parentGroupDir.control instanceof FormArray) {
         this.parentGroupDir.control.push(this.formControl);
-        console.log(this.control, this.parentGroupDir.control);
       } else
         (this.parentGroupDir.control as FormGroup).addControl(
           this.control.controlKey,

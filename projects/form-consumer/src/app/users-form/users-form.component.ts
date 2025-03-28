@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
+  FormArray,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
@@ -30,7 +31,11 @@ export class UsersFormComponent {
     reviewRating: new FormControl('', [Validators.required]),
   });
   protected onSubmit(form: FormGroup) {
-    console.log('Submitted data: ', form.value);
+    console.log(
+      'Submitted data: ',
+      form.value,
+      (form.controls['phones'] as FormArray).controls
+    );
     // form.reset();
   }
 }
