@@ -5,22 +5,19 @@
       "controlType": "input",
       "type": "text",
       "label": "Full Name",
-      "value": "",
+      "value": "aliabodraa@yahoo.com",
       "order": 0,
       "validators": {
         "required": true,
         "minLength": 2,
-        "banWords": [
-          "Test",
-          "Dummy"
-        ]
+        "banWords": ["Test", "Dummy"]
       }
     },
     "email": {
       "controlType": "input",
       "type": "email",
       "label": "Email",
-      "value": "",
+      "value": "aliabodraa@yahoo.com",
       "order": 1,
       "validators": {
         "email": true
@@ -29,7 +26,7 @@
     "role": {
       "controlType": "select",
       "label": "User Role",
-      "value": "",
+      "value": "editor",
       "order": 2,
       "options": [
         {
@@ -54,21 +51,21 @@
         "youtube": {
           "controlType": "input",
           "label": "YouTube",
-          "value": null,
+          "value": 1,
           "type": "text",
           "order": 0
         },
         "twitter": {
           "controlType": "input",
           "label": "Twitter",
-          "value": null,
+          "value": 2,
           "type": "text",
           "order": 1
         },
         "instagram": {
           "controlType": "input",
           "label": "Instagram",
-          "value": null,
+          "value": 3,
           "type": "text",
           "order": 2
         }
@@ -77,7 +74,7 @@
     "terms": {
       "controlType": "checkbox",
       "label": "Terms & Conditions were accepted",
-      "value": false,
+      "value": true,
       "order": 4,
       "validators": {
         "requiredTrue": true
@@ -87,23 +84,39 @@
       "controlType": "array",
       "label": "Links to your Phones numbers",
       "order": 5,
-      "typingStructureOfArrayChild": {
-        "input": "number"
+      "childArrayStructure": {
+        "controlType": "input",
+        "type": "number",
+        "defaultCreationValue": 11
       },
       "controls": [
         {
           "controlType": "input",
-          "label": "phone 1",
-          "value": "111",
+          "label": "label 1",
+          "value": 1,
           "type": "number",
           "order": 0
         },
         {
           "controlType": "input",
-          "label": "phone 2",
-          "value": "222",
+          "label": "label 2",
+          "value": 2,
           "type": "number",
           "order": 1
+        },
+        {
+          "controlType": "input",
+          "label": "label 3",
+          "value": 3,
+          "type": "number",
+          "order": 2
+        },
+        {
+          "controlType": "input",
+          "label": "label 4",
+          "value": 4,
+          "type": "number",
+          "order": 3
         }
       ]
     },
@@ -111,20 +124,19 @@
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 6,
-      "typingStructureOfArrayChild": {
-        "group": {
-          "fieldsTypes": {
-            "0": {
-              "input": "text"
-            },
-            "1": {
-              "input": "number"
-            }
+      "childArrayStructure": {
+        "controlType": "group",
+        "fields": {
+          "label": {
+            "controlType": "input",
+            "type": "number",
+            "defaultCreationValue": 1
           },
-          "fieldsNames": [
-            "label",
-            "phoneNumber"
-          ]
+          "phoneNumber": {
+            "controlType": "input",
+            "type": "number",
+            "defaultCreationValue": 2
+          }
         }
       },
       "controls": [
@@ -136,14 +148,14 @@
             "label": {
               "controlType": "input",
               "label": "phone label 1",
-              "value": null,
+              "value": "0933751751",
               "type": "text",
               "order": 0
             },
             "phoneNumber": {
               "controlType": "input",
               "label": "phone 1",
-              "value": "0933751751",
+              "value": "0962636524",
               "type": "number",
               "order": 1
             }
@@ -157,7 +169,7 @@
             "label": {
               "controlType": "input",
               "label": "phone label 1",
-              "value": null,
+              "value": "0933751751",
               "type": "text",
               "order": 0
             },
@@ -167,6 +179,89 @@
               "value": "0962636524",
               "type": "number",
               "order": 1
+            }
+          }
+        }
+      ]
+    },
+    "complexPhonesH": {
+      "controlType": "array",
+      "label": "Links to your complex Phones section numbers",
+      "order": 7,
+      "childArrayStructure": {
+        "controlType": "group",
+        "fields": {
+          "label00": {
+            "label": {
+              "controlType": "input",
+              "type": "number",
+              "defaultCreationValue": 1
+            },
+            "phoneNumber": {
+              "controlType": "input",
+              "type": "number",
+              "defaultCreationValue": 2
+            }
+          },
+          "phoneNumber00": {
+            "label": {
+              "controlType": "input",
+              "type": "number",
+              "defaultCreationValue": 1
+            },
+            "phoneNumber": {
+              "controlType": "input",
+              "type": "number",
+              "defaultCreationValue": 2
+            }
+          }
+        }
+      },
+      "controls": [
+        {
+          "controlType": "group",
+          "label": "Phone Group 1",
+          "order": 0,
+          "controls": {
+            "label00": {
+              "controlType": "group",
+              "label": "Nested Phone Group 1",
+              "controls": {
+                "label": {
+                  "controlType": "input",
+                  "label": "phone label 1",
+                  "value": "0933751751",
+                  "type": "text",
+                  "order": 0
+                },
+                "phoneNumber": {
+                  "controlType": "input",
+                  "label": "phone 1",
+                  "value": "0962636524",
+                  "type": "number",
+                  "order": 1
+                }
+              }
+            },
+            "phoneNumber11": {
+              "controlType": "group",
+              "label": "Nested Phone Group 2",
+              "controls": {
+                "label": {
+                  "controlType": "input",
+                  "label": "phone label 1",
+                  "value": "0933751751",
+                  "type": "text",
+                  "order": 0
+                },
+                "phoneNumber": {
+                  "controlType": "input",
+                  "label": "phone 1",
+                  "value": "0962636524",
+                  "type": "number",
+                  "order": 1
+                }
+              }
             }
           }
         }

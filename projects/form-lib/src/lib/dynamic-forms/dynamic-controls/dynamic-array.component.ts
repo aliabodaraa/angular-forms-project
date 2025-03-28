@@ -3,6 +3,8 @@ import {
   Component,
   HostBinding,
   inject,
+  Input,
+  SimpleChanges,
 } from '@angular/core';
 import {
   BaseDynamicControl,
@@ -12,34 +14,40 @@ import {
 } from './base-dynamic-control';
 import { FormArray } from '@angular/forms';
 import { DynamicControlResolver } from '../dynamic-control-resolver.service';
-import { ControlInjectorPipe } from '../control-injector.pipe';
+import {
+  ARRAY,
+  ChildArrayStructure,
+  DynamicControl,
+} from '../dynamic-forms.model';
 
 @Component({
   selector: 'app-dynamic-array',
   standalone: true,
-  imports: [...sharedDynamicControlDeps, ControlInjectorPipe],
+  imports: [...sharedDynamicControlDeps],
   viewProviders: [dynamicControlProvider],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <fieldset [formArrayName]="control.controlKey">
-      <legend>{{ control.config.label }}</legend>
+    {{ lastOrder }}
+    <fieldset [formArrayName]="controlKey">
+      <legend>{{ config.label }}</legend>
       <button class="add-button" (click)="addItem()" type="button">+</button>
       <ng-container
         *ngFor="
-          let control of config_arr | keyvalue : comparatorFn;
+          let control of arrayControls | keyvalue : comparatorFn;
           index as i;
           trackBy: trackByFn
         "
       >
-        <!-- {{ control.value.controlType | json }}{{ control | json }} -->
         <div style="display:flex;gap: 5px;">
           <ng-container
-            [ngComponentOutlet]="
-              controlResolver.resolve(control.value.controlType) | async
+            *ngIf="
+              controlResolver.resolve(control.value.controlType)
+                | async as componentType
             "
-            [ngComponentOutletInjector]="
-              control.key | controlInjector : control.value
-            "
+            [ngComponentOutlet]="componentType"
+            [ngComponentOutletInputs]="{
+              controlKey: control.key,
+              config: control.value
+            }"
           ></ng-container>
           <button
             class="remove-button"
@@ -47,77 +55,97 @@ import { ControlInjectorPipe } from '../control-injector.pipe';
             (click)="removeItem(i)"
             type="button"
           >
-            -
-            <!-- {{ control.value.order }} -->
+            -{{ control.value.order }}
           </button>
         </div>
-
-        <!-- {{ random }} -->
       </ng-container>
     </fieldset>
   `,
   styles: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicArrayComponent extends BaseDynamicControl {
   @HostBinding('class') override hostClass = 'form-field-array';
+  get configArray(): ARRAY {
+    return this.config as ARRAY;
+  }
   controlResolver = inject(DynamicControlResolver);
-  override formControl = new FormArray<any>(
-    [],
-    this.resolveValidators(this.control.config)
-  );
+  override formControl = new FormArray<any>([]);
   protected comparatorFn = comparatorFn;
-  random = Math.random();
-  config_arr = this.control.config.controls as any[];
-
-  addItem() {
-    let mainObh = {};
-    const structure = this.control.config.typingStructureOfArrayChild;
-    for (const ctrlType in structure) {
-      if (ctrlType === 'input') {
-        mainObh = {
-          controlType: ctrlType,
-          label: `label ${this.formControl.length + 1 || 1}`,
-          value: '',
-          type: structure?.[ctrlType],
-          order: this.formControl?.length || 1,
-        };
-      } else if (ctrlType === 'group') {
-        let ctrls = {};
-        let group = structure?.[ctrlType];
-        for (let index = 0; index < group.fieldsNames.length; index++) {
-          const fieldName = group.fieldsNames[index];
-          ctrls = {
-            ...ctrls,
-            [fieldName]: {
-              controlType: Object.keys(group.fieldsTypes[index])[0],
-              value: null,
-              type: Object.values(group.fieldsTypes[index])[0],
-              order: index,
-            },
-          };
-        }
-        mainObh = {
-          controlType: ctrlType,
-          label: `${ctrlType} ${this.formControl.length + 1 || 1}`,
-          order: this.formControl?.length || 1,
-          controls: { ...ctrls },
-        };
-      }
+  arrayControls: any[] = [];
+  _lastOrder = this.arrayControls?.length ?? 0;
+  override ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes);
+    console.log(changes, 'changes');
+    if (changes['config'].currentValue) {
+      console.log('control changes');
+      this.arrayControls = this.configArray?.controls as any[];
+      this.lastOrder = this.arrayControls.length ?? 0;
     }
+  }
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.formControl.valueChanges.subscribe((values) => {
+      console.log(values);
+    });
+  }
+  get lastOrder() {
+    return this._lastOrder;
+  }
+  set lastOrder(newOrder) {
+    this._lastOrder = newOrder;
+  }
+  addItem() {
+    let newCtrl = {};
 
-    this.config_arr.push(mainObh);
+    let structure;
+    structure = this.configArray.childArrayStructure;
+    if (structure.controlType === 'input') {
+      newCtrl = {
+        controlType: structure.controlType,
+        label: `${structure.controlType} ${this.lastOrder + 1}`,
+        value: structure.defaultCreationValue,
+        type: structure.type,
+        order: this.lastOrder,
+      };
+      console.log(newCtrl, 'newCtrl');
+    } else if (structure.controlType === 'group') {
+      let ctrls = {};
+      let group = structure.fields;
+      Object.values(group).forEach((ctrl, index) => {
+        const defaultVal = ctrl.defaultCreationValue;
+        const ctrlName = Object.keys(group)[index];
+        ctrls = {
+          ...ctrls,
+          [ctrlName]: {
+            controlType: ctrl.controlType,
+            label: `${ctrl.controlType} ${index + 1}`,
+            value: defaultVal,
+            type: ctrl.type,
+            order: index,
+          },
+        };
+      });
+      newCtrl = {
+        controlType: structure.controlType,
+        label: `${structure.controlType} ${this.lastOrder + 1}`,
+        order: this.lastOrder,
+        controls: { ...ctrls },
+      };
+      console.log(newCtrl, 'newCtrl');
+    }
+    this.lastOrder++;
+
+    this.arrayControls.push(newCtrl);
   }
   removeItem(index: number) {
-    // const copyArr = this.formControl;
-    // this.formControl.clear();
-    this.config_arr.splice(index, 1);
     this.formControl.removeAt(index);
-    // for (let index = 0; index <= copyArr.length; index++) {
-    //   if (index >= this.config_arr.length) copyArr.removeAt(index);
-    // }
-    // this.formControl = copyArr;
+    this.arrayControls.splice(index, 1);
   }
-  trackByFn(index: number, item: any): any {
+  get lengthArr() {
+    return this.formControl.length;
+  }
+  trackByFn(_: number, item: any): number {
     return item.value.order;
   }
 }

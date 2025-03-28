@@ -12,9 +12,9 @@
     "test-angular-form-lib": "ng test form-lib --watch=false --browsers=ChromeHeadless",
     "lint-form-lib": "ng lint form-lib",
     "wait-for-lib": "wait-on dist/form-lib/package.json",
-    "delay": "node -e \"setTimeout(()=>process.exit(0), 40000)\"",
+    "delay": "node -e \"setTimeout(()=>process.exit(0), 60000)\"",
     "serve-app": "ng serve",
-    "launch-dev": "start cmd /k \"npm run watch-form-lib\" && npm run delay && npm run wait-for-lib && start cmd /k \"npm run serve-app\""
+    "launch-dev": "start cmd /k \"npm run watch-form-lib\" && npm run wait-for-lib && npm run delay && start cmd /k \"npm run serve-app\""
   },
   "private": true,
   "dependencies": {

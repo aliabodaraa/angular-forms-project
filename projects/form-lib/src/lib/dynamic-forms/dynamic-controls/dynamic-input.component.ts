@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import {
   BaseDynamicControl,
   dynamicControlProvider,
   sharedDynamicControlDeps,
 } from './base-dynamic-control';
-import { FormArray } from '@angular/forms';
+import { DynamicControl, INPUT } from '../dynamic-forms.model';
 
 @Component({
   selector: 'app-dynamic-input',
@@ -12,17 +12,17 @@ import { FormArray } from '@angular/forms';
   imports: [...sharedDynamicControlDeps],
   viewProviders: [dynamicControlProvider],
   template: `
-    <label [for]="control.controlKey">{{ control.config.label }}</label>
+    <label [for]="controlKey">{{ controlKey }}</label>
     <input
-      [formControlName]="control.controlKey"
-      [value]="control.config.value"
-      [id]="control.controlKey"
-      [type]="control.config.type"
+      [formControlName]="controlKey"
+      [value]="configInput?.value"
+      [id]="controlKey"
+      [type]="configInput?.type"
     />
   `,
 })
 export class DynamicInputComponent extends BaseDynamicControl {
-  constructor() {
-    super();
+  get configInput(): INPUT | null {
+    return this.config as INPUT;
   }
 }

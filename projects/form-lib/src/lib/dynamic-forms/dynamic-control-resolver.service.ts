@@ -18,6 +18,10 @@ export class DynamicControlResolver {
       import('./dynamic-controls/dynamic-select.component').then(
         (c) => c.DynamicSelectComponent
       ),
+    radio: () =>
+      import('./dynamic-controls/dynamic-radio.component').then(
+        (c) => c.DynamicRadioComponent
+      ),
     checkbox: () =>
       import('./dynamic-controls/dynamic-checkbox.component').then(
         (c) => c.DynamicCheckboxComponent

@@ -5,23 +5,24 @@ import {
   sharedDynamicControlDeps,
 } from './base-dynamic-control';
 import { ValidatorMessageContainer } from '../input-error/validator-message-container.directive';
-import { CHECKBOX } from '../dynamic-forms.model';
+import { RADIO } from '../dynamic-forms.model';
 
 @Component({
-  selector: 'app-dynamic-checkbox',
+  selector: 'app-dynamic-radio',
   standalone: true,
   imports: [...sharedDynamicControlDeps, ValidatorMessageContainer],
   viewProviders: [dynamicControlProvider],
   template: `
     <div>
       <input
-        type="checkbox"
+        *ngFor="let item of []"
+        type="radio"
         [container]="containerDir.container"
         [formControlName]="controlKey"
-        [checked]="configCheckbox.value"
+        [checked]="configRadio"
         [id]="controlKey"
       />
-      <label [for]="controlKey">{{ configCheckbox.label }}</label>
+      <label [for]="controlKey">{{ configRadio?.label }}</label>
     </div>
     <ng-container
       validatorMessageContainer
@@ -38,8 +39,8 @@ import { CHECKBOX } from '../dynamic-forms.model';
     `,
   ],
 })
-export class DynamicCheckboxComponent extends BaseDynamicControl {
-  get configCheckbox(): CHECKBOX {
-    return this.config as CHECKBOX;
+export class DynamicRadioComponent extends BaseDynamicControl {
+  get configRadio(): RADIO | null {
+    return this.config as RADIO;
   }
 }

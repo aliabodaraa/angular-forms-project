@@ -20,7 +20,7 @@ import { bufferCount, filter, Subject, take, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'lib-form',
-  imports: [CommonModule, ReactiveFormsModule, ControlInjectorPipe],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div
       *ngIf="form && config$ | async as formConfig"
@@ -31,12 +31,15 @@ import { bufferCount, filter, Subject, take, takeUntil } from 'rxjs';
         *ngFor="let control of formConfig.controls | keyvalue : comparatorFn"
       >
         <ng-container
-          [ngComponentOutlet]="
-            controlResolver.resolve(control.value.controlType) | async
+          *ngIf="
+            controlResolver.resolve(control.value.controlType)
+              | async as componentType
           "
-          [ngComponentOutletInjector]="
-            control.key | controlInjector : control.value
-          "
+          [ngComponentOutlet]="componentType"
+          [ngComponentOutletInputs]="{
+            controlKey: control.key,
+            config: control.value
+          }"
         ></ng-container>
       </ng-container>
 

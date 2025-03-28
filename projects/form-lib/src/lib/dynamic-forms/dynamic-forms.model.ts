@@ -1,42 +1,191 @@
 import { ValidatorFn, Validators } from '@angular/forms';
 
-export interface DynamicOptions {
-  label: string;
-  value: string;
-}
-type CustomValidators = { banWords: ValidatorFn };
 type ValidatorKeys = keyof Omit<
-  typeof Validators & CustomValidators,
+  typeof Validators & { banWords: ValidatorFn },
   'prototype' | 'compose' | 'composeAsync'
 >;
-export interface DynamicControl<T = 'input', V = string> {
-  controlType: 'input' | 'select' | 'checkbox' | 'group' | 'array';
-  type?: string;
+
+interface FIELD {
   label: string;
-  typingStructureOfArrayChild?: {
-    [x in 'input' | 'select' | 'checkbox' | 'group']: {
-      fieldsTypes: {
-        [x: number]: {
-          [x in 'input' | 'select' | 'checkbox' | 'group' | 'array']:
-            | 'text'
-            | 'number'
-            | 'email';
-        };
-      };
-      fieldsNames: string[];
-    };
-  };
   order: number;
-  value: V | null;
-  options?: DynamicOptions[];
-  controls?: DynamicFormConfig['controls'] | DynamicControl<T, V>[];
   validators?: {
     [key in ValidatorKeys]?: unknown;
   };
 }
+export interface HAS_VALUE<T = string | number> {
+  value: T;
+}
+export interface INPUT extends FIELD, HAS_VALUE {
+  controlType: 'input';
+  type: string;
+}
+
+export interface CHECKBOX extends FIELD, HAS_VALUE<boolean> {
+  controlType: 'checkbox';
+  type: string;
+}
+export interface RADIO extends FIELD {
+  controlType: 'radio';
+  ctrlValues: any[];
+}
+interface OPTION extends HAS_VALUE<string> {
+  label: string;
+}
+export interface SELECT extends FIELD, HAS_VALUE<any> {
+  controlType: 'select';
+  type: string;
+  options: OPTION[];
+}
+
+export interface GROUP extends FIELD {
+  controlType: 'group';
+  controls: Record<string, DynamicControl>;
+}
+export interface ARRAY extends FIELD {
+  controlType: 'array';
+  childArrayStructure: ChildArrayStructure;
+  controls: DynamicControl[];
+}
+export type DynamicControl = INPUT | CHECKBOX | RADIO | SELECT | GROUP | ARRAY;
 export interface DynamicFormConfig {
   description: string;
-  controls: {
-    [key: string]: DynamicControl;
-  };
+  controls: Record<string, DynamicControl>;
 }
+
+//---------ChildArrayStructure--------
+export type FieldTypes =
+  | 'input'
+  | 'select'
+  | 'checkbox'
+  | 'radio'
+  | 'group'
+  | 'array';
+interface SelectField {
+  controlType: 'select';
+}
+export type FieldsArrayTypes = 'input' | 'group' | 'array';
+type InputTypes =
+  | 'text'
+  | 'password'
+  | 'email'
+  | 'tel'
+  | 'search'
+  | 'number'
+  | 'date'
+  | 'datetime-local'
+  | 'month'
+  | 'week'
+  | 'time'
+  | 'checkbox'
+  | 'radio'
+  | 'file'
+  | 'image'
+  | 'rang'
+  | 'color'
+  | 'hidden';
+export interface InputField {
+  ctrlName: string;
+  controlType: 'input';
+  defaultCreationValue: InputTypes;
+  type: InputTypes;
+}
+export interface GroupField {
+  ctrlName: string;
+  controlType: 'group';
+  fields:
+    | GroupOfInputs['fields']
+    | GroupOfGroup['fields']
+    | ArrayOfInputs['fields']
+    | ArrayOfGroup['fields']
+    | ArrayOfArray['fields'];
+}
+interface ArrayOfInputs {
+  controlType: 'array';
+  fields: InputField[];
+}
+interface ArrayOfGroup {
+  controlType: 'array';
+  fields: Record<number, GroupField>;
+}
+interface GroupOfInputs {
+  controlType: 'group';
+  fields: InputField[];
+}
+interface GroupOfGroup {
+  controlType: 'group';
+  fields: Record<number, GroupField>;
+}
+
+interface ArrayOfArray {
+  controlType: 'array';
+  fields: Record<number, ArrayOfGroup | ArrayOfInputs>;
+}
+
+export type ChildArrayStructure = InputField | GroupField;
+
+//---------ChildArrayStructure--------
+let case1 = {
+  //case 1
+  childArrayStructure: {
+    controlType: 'input',
+    type: 'number',
+  },
+};
+let case2 = {
+  //case 2
+  childArrayStructure: {
+    controlType: 'group',
+    fields: {
+      0: {
+        ctrlName: 'g1',
+        controlType: 'group',
+        label: 'Phone Group 1',
+        order: 0,
+        controls: {
+          label: {
+            controlType: 'input',
+            label: 'phone label 1',
+            value: '0933751751',
+            type: 'text',
+            order: 0,
+          },
+          phoneNumber: {
+            controlType: 'input',
+            label: 'phone 1',
+            value: '0962636524',
+            type: 'number',
+            order: 1,
+          },
+        },
+      },
+    },
+  },
+};
+let case3 = {
+  //case 3
+  childArrayStructure: {
+    controlType: 'array',
+    fields: [
+      {
+        ctrlName: 'c1',
+        controlType: 'input',
+        type: 'number',
+      },
+    ],
+  },
+};
+let case4 = {
+  //case 4
+  childArrayStructure: {
+    controlType: 'array',
+    fields: [
+      [
+        {
+          ctrlName: 'c1',
+          controlType: 'input',
+          type: 'number',
+        },
+      ],
+    ],
+  },
+};

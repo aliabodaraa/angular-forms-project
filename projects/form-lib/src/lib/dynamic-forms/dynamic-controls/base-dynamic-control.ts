@@ -4,7 +4,10 @@ import {
   Directive,
   HostBinding,
   inject,
+  Input,
+  NgZone,
   OnInit,
+  SimpleChanges,
   StaticProvider,
 } from '@angular/core';
 import {
@@ -16,11 +19,22 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { CONTROL_DATA } from '../control-data.token';
-import { DynamicControl } from '../dynamic-forms.model';
+import {
+  ARRAY,
+  CHECKBOX,
+  DynamicControl,
+  GROUP,
+  HAS_VALUE,
+  INPUT,
+  RADIO,
+  SELECT,
+} from '../dynamic-forms.model';
 import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
 import { banWords } from '../validators/ban-words.validator';
 
+interface ControlWithValue {
+  value: string | number | boolean;
+}
 export const comparatorFn = (
   a: KeyValue<string, DynamicControl>,
   b: KeyValue<string, DynamicControl>
@@ -39,34 +53,35 @@ export const dynamicControlProvider: StaticProvider = {
 
 @Directive()
 export class BaseDynamicControl implements OnInit {
+  @Input() controlKey: string;
+  @Input() config: DynamicControl;
   @HostBinding('class') hostClass = 'form-field';
 
-  control = inject(CONTROL_DATA);
   cd = inject(ChangeDetectorRef);
-  formControl: AbstractControl = new FormControl(
-    this.control.config.value,
-    this.resolveValidators(this.control.config)
-  );
 
+  formControl: AbstractControl = new FormControl();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['config']?.currentValue) {
+      if (this.hasValue(this.config))
+        this.formControl.patchValue(this.config.value);
+      this.formControl.setValidators(this.resolveValidators(this.config));
+    }
+  }
+  protected ngZone = inject(NgZone);
   protected parentGroupDir = inject(ControlContainer);
 
   ngOnInit() {
     try {
       if (this.parentGroupDir.control instanceof FormArray) {
         this.parentGroupDir.control.push(this.formControl);
-        console.log(this.control, this.parentGroupDir.control);
       } else
         (this.parentGroupDir.control as FormGroup).addControl(
-          this.control.controlKey,
+          this.controlKey,
           this.formControl
         );
     } catch (e) {
-      console.log(e, '---', this.control, this.formControl);
-    }
-  }
-  addToArray() {
-    if (this.parentGroupDir.control instanceof FormArray) {
-      this.parentGroupDir.control.push(this.formControl);
+      console.log(e, '---', this.formControl);
     }
   }
 
@@ -95,5 +110,27 @@ export class BaseDynamicControl implements OnInit {
         return Validators.nullValidator;
       }
     );
+  }
+
+  isGroup(d: DynamicControl): d is GROUP {
+    return d.controlType === 'group';
+  }
+  isArray(d: DynamicControl): d is ARRAY {
+    return d.controlType === 'array';
+  }
+  isInput(d: DynamicControl): d is INPUT {
+    return d.controlType === 'input';
+  }
+  isSelect(d: DynamicControl): d is SELECT {
+    return d.controlType === 'select';
+  }
+  isCheckbox(d: DynamicControl): d is CHECKBOX {
+    return d.controlType === 'checkbox';
+  }
+  isRadio(d: DynamicControl): d is RADIO {
+    return d.controlType === 'radio';
+  }
+  hasValue(ctrl: any): ctrl is HAS_VALUE<any> {
+    return 'value' in ctrl;
   }
 }
