@@ -43,6 +43,8 @@ export interface GROUP extends FIELD {
 }
 export interface ARRAY extends FIELD {
   controlType: 'array';
+  isRemovable: boolean;
+  isAddable: boolean;
   childArrayStructure: ChildArrayStructure;
   controls: DynamicControl[];
 }
@@ -83,45 +85,28 @@ type InputTypes =
   | 'rang'
   | 'color'
   | 'hidden';
+
 export interface InputField {
-  ctrlName: string;
   controlType: 'input';
-  defaultCreationValue: InputTypes;
+  defaultCreationValue: string | number;
   type: InputTypes;
 }
+
 export interface GroupField {
-  ctrlName: string;
   controlType: 'group';
-  fields:
-    | GroupOfInputs['fields']
-    | GroupOfGroup['fields']
-    | ArrayOfInputs['fields']
-    | ArrayOfGroup['fields']
-    | ArrayOfArray['fields'];
-}
-interface ArrayOfInputs {
-  controlType: 'array';
-  fields: InputField[];
-}
-interface ArrayOfGroup {
-  controlType: 'array';
-  fields: Record<number, GroupField>;
-}
-interface GroupOfInputs {
-  controlType: 'group';
-  fields: InputField[];
-}
-interface GroupOfGroup {
-  controlType: 'group';
-  fields: Record<number, GroupField>;
+  defaultCreationLabel: string;
+  fields: Record<string, InputField> | Record<string, GroupField>;
 }
 
-interface ArrayOfArray {
+interface ArrayField {
   controlType: 'array';
-  fields: Record<number, ArrayOfGroup | ArrayOfInputs>;
+  defaultCreationLabel: string;
+  isRemovable: boolean;
+  isAddable: boolean;
+  fields: InputField[] | GroupField[] | ArrayField[];
 }
 
-export type ChildArrayStructure = InputField | GroupField;
+export type ChildArrayStructure = InputField | GroupField | ArrayField;
 
 //---------ChildArrayStructure--------
 let case1 = {

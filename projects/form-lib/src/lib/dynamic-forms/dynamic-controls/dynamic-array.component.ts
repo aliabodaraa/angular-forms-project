@@ -18,6 +18,8 @@ import {
   ARRAY,
   ChildArrayStructure,
   DynamicControl,
+  GroupField,
+  InputField,
 } from '../dynamic-forms.model';
 
 @Component({
@@ -26,10 +28,16 @@ import {
   imports: [...sharedDynamicControlDeps],
   viewProviders: [dynamicControlProvider],
   template: `
-    {{ lastOrder }}
     <fieldset [formArrayName]="controlKey">
       <legend>{{ config.label }}</legend>
-      <button class="add-button" (click)="addItem()" type="button">+</button>
+      <button
+        *ngIf="isAddable"
+        class="add-button"
+        (click)="addCtrl()"
+        type="button"
+      >
+        +
+      </button>
       <ng-container
         *ngFor="
           let control of arrayControls | keyvalue : comparatorFn;
@@ -50,12 +58,13 @@ import {
             }"
           ></ng-container>
           <button
+            *ngIf="isRemovable"
             class="remove-button"
-            style="width: 19%;margin-top: 22px;"
-            (click)="removeItem(i)"
+            style="width: 20%;margin-top: 22px;"
+            (click)="removeCtrl(i)"
             type="button"
           >
-            -{{ control.value.order }}
+            -
           </button>
         </div>
       </ng-container>
@@ -69,82 +78,104 @@ export class DynamicArrayComponent extends BaseDynamicControl {
   get configArray(): ARRAY {
     return this.config as ARRAY;
   }
-  controlResolver = inject(DynamicControlResolver);
-  override formControl = new FormArray<any>([]);
-  protected comparatorFn = comparatorFn;
-  arrayControls: any[] = [];
-  _lastOrder = this.arrayControls?.length ?? 0;
-  override ngOnChanges(changes: SimpleChanges): void {
-    super.ngOnChanges(changes);
-    console.log(changes, 'changes');
-    if (changes['config'].currentValue) {
-      console.log('control changes');
-      this.arrayControls = this.configArray?.controls as any[];
-      this.lastOrder = this.arrayControls.length ?? 0;
-    }
-  }
-  override ngOnInit(): void {
-    super.ngOnInit();
-    this.formControl.valueChanges.subscribe((values) => {
-      console.log(values);
-    });
-  }
+  private _lastOrder = 0;
   get lastOrder() {
     return this._lastOrder;
   }
   set lastOrder(newOrder) {
     this._lastOrder = newOrder;
   }
-  addItem() {
-    let newCtrl = {};
+  controlResolver = inject(DynamicControlResolver);
+  override formControl = new FormArray<any>([]);
+  protected comparatorFn = comparatorFn;
+  arrayControls: ARRAY['controls'] = [];
+  isAddable: boolean = true;
+  isRemovable: boolean = true;
 
-    let structure;
-    structure = this.configArray.childArrayStructure;
-    if (structure.controlType === 'input') {
+  override ngOnChanges(changes: SimpleChanges): void {
+    super.ngOnChanges(changes);
+    if (changes['config']?.currentValue?.controls) {
+      this.arrayControls = changes['config']?.currentValue?.controls;
+      this.lastOrder = this.arrayControls.length ?? 0;
+      this.isAddable = this.configArray.isAddable ?? this.isAddable;
+      this.isRemovable = this.configArray?.isRemovable ?? this.isRemovable;
+    }
+  }
+
+  override ngOnInit(): void {
+    super.ngOnInit();
+    this.formControl.valueChanges.subscribe((values) => {
+      console.log(values);
+    });
+  }
+
+  addCtrl() {
+    const childStructure = this.configArray.childArrayStructure;
+    const newCtrl = this.buildDesiredObjectStructure(
+      childStructure
+    ) as DynamicControl;
+    this.lastOrder++;
+    this.arrayControls.push(newCtrl);
+  }
+
+  private buildDesiredObjectStructure(
+    childStructure: ChildArrayStructure,
+    lastOrder: number = this.lastOrder
+  ) {
+    let newCtrl = {};
+    if (childStructure.controlType === 'input') {
       newCtrl = {
-        controlType: structure.controlType,
-        label: `${structure.controlType} ${this.lastOrder + 1}`,
-        value: structure.defaultCreationValue,
-        type: structure.type,
+        controlType: childStructure.controlType,
+        label: `${childStructure.controlType} ${lastOrder + 1}`,
+        value: childStructure.defaultCreationValue,
+        type: childStructure.type,
         order: this.lastOrder,
       };
-      console.log(newCtrl, 'newCtrl');
-    } else if (structure.controlType === 'group') {
+    } else if (childStructure.controlType === 'group') {
+      let group = childStructure.fields;
       let ctrls = {};
-      let group = structure.fields;
       Object.values(group).forEach((ctrl, index) => {
-        const defaultVal = ctrl.defaultCreationValue;
         const ctrlName = Object.keys(group)[index];
         ctrls = {
           ...ctrls,
-          [ctrlName]: {
-            controlType: ctrl.controlType,
-            label: `${ctrl.controlType} ${index + 1}`,
-            value: defaultVal,
-            type: ctrl.type,
-            order: index,
-          },
+          [ctrlName]: this.buildDesiredObjectStructure(
+            ctrl,
+            index
+          ) as DynamicControl,
         };
       });
       newCtrl = {
-        controlType: structure.controlType,
-        label: `${structure.controlType} ${this.lastOrder + 1}`,
-        order: this.lastOrder,
-        controls: { ...ctrls },
+        controlType: childStructure.controlType,
+        label: `${childStructure.defaultCreationLabel || ''} ${lastOrder + 1}`,
+        order: lastOrder,
+        controls: ctrls,
       };
-      console.log(newCtrl, 'newCtrl');
+    } else if (childStructure.controlType === 'array') {
+      let array = childStructure.fields;
+      let ctrls: ARRAY['controls'] = [];
+      array.forEach((ctrl, index) => {
+        ctrls.push(
+          this.buildDesiredObjectStructure(ctrl, index) as DynamicControl
+        );
+      });
+      newCtrl = {
+        controlType: childStructure.controlType,
+        label: `${childStructure.defaultCreationLabel || ''} ${lastOrder + 1}`,
+        order: lastOrder,
+        controls: ctrls,
+        isAddable: childStructure.isAddable,
+        isRemovable: childStructure.isRemovable,
+      };
     }
-    this.lastOrder++;
 
-    this.arrayControls.push(newCtrl);
+    return newCtrl;
   }
-  removeItem(index: number) {
+
+  removeCtrl(index: number) {
     this.formControl.removeAt(index);
     this.arrayControls.splice(index, 1);
   }
-  get lengthArr() {
-    return this.formControl.length;
-  }
+
   trackByFn(_: number, item: any): number {
     return item.value.order;
   }

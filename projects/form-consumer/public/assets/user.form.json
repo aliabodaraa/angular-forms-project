@@ -80,7 +80,7 @@
         "requiredTrue": true
       }
     },
-    "phones": {
+    "ArrayOfControls": {
       "controlType": "array",
       "label": "Links to your Phones numbers",
       "order": 5,
@@ -120,11 +120,12 @@
         }
       ]
     },
-    "complexPhones": {
+    "ArrayOfGroups": {
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 6,
       "childArrayStructure": {
+        "defaultCreationLabel": "Nested Array Of Groups",
         "controlType": "group",
         "fields": {
           "label": {
@@ -184,35 +185,44 @@
         }
       ]
     },
-    "complexPhonesH": {
+    "ArrayOfComplexGroups": {
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 7,
       "childArrayStructure": {
+        "defaultCreationLabel": "Nested Array Of Complex Groups",
         "controlType": "group",
         "fields": {
           "label00": {
-            "label": {
-              "controlType": "input",
-              "type": "number",
-              "defaultCreationValue": 1
-            },
-            "phoneNumber": {
-              "controlType": "input",
-              "type": "number",
-              "defaultCreationValue": 2
+            "defaultCreationLabel": "Nested label00",
+            "controlType": "group",
+            "fields": {
+              "label": {
+                "controlType": "input",
+                "type": "number",
+                "defaultCreationValue": 1
+              },
+              "phoneNumber": {
+                "controlType": "input",
+                "type": "number",
+                "defaultCreationValue": 2
+              }
             }
           },
           "phoneNumber00": {
-            "label": {
-              "controlType": "input",
-              "type": "number",
-              "defaultCreationValue": 1
-            },
-            "phoneNumber": {
-              "controlType": "input",
-              "type": "number",
-              "defaultCreationValue": 2
+            "defaultCreationLabel": "Nested phoneNumber00",
+            "controlType": "group",
+            "fields": {
+              "label": {
+                "controlType": "input",
+                "type": "number",
+                "defaultCreationValue": 1
+              },
+              "phoneNumber": {
+                "controlType": "input",
+                "type": "number",
+                "defaultCreationValue": 2
+              }
             }
           }
         }
@@ -243,7 +253,7 @@
                 }
               }
             },
-            "phoneNumber11": {
+            "phoneNumber00": {
               "controlType": "group",
               "label": "Nested Phone Group 2",
               "controls": {
@@ -264,6 +274,40 @@
               }
             }
           }
+        }
+      ]
+    },
+    "ArrayNestedComplexArray": {
+      "controlType": "array",
+      "label": "Links to your complex Phones section numbers",
+      "order": 7,
+      "childArrayStructure": {
+        "defaultCreationLabel": "Array Of Array",
+        "controlType": "array",
+        "isRemovable": false,
+        "isAddable": false,
+        "fields": [
+          {
+            "controlType": "input",
+            "type": "number",
+            "defaultCreationValue": 2
+          }
+        ]
+      },
+      "controls": [
+        {
+          "controlType": "array",
+          "isRemovable": false,
+          "isAddable": false,
+          "controls": [
+            {
+              "controlType": "input",
+              "label": "phone label 1",
+              "value": "0933751751",
+              "type": "text",
+              "order": 0
+            }
+          ]
         }
       ]
     }
