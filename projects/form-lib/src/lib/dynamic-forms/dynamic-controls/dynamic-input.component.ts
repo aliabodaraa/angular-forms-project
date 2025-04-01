@@ -1,10 +1,10 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   BaseDynamicControl,
   dynamicControlProvider,
   sharedDynamicControlDeps,
 } from './base-dynamic-control';
-import { DynamicControl, INPUT } from '../dynamic-forms.model';
+import { INPUT } from '../dynamic-forms.model';
 
 @Component({
   selector: 'app-dynamic-input',

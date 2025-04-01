@@ -3,8 +3,9 @@ import {
   Component,
   HostBinding,
   inject,
-  Input,
+  Optional,
   SimpleChanges,
+  SkipSelf,
 } from '@angular/core';
 import {
   BaseDynamicControl,
@@ -18,8 +19,6 @@ import {
   ARRAY,
   ChildArrayStructure,
   DynamicControl,
-  GroupField,
-  InputField,
 } from '../dynamic-forms.model';
 
 @Component({
@@ -78,6 +77,12 @@ export class DynamicArrayComponent extends BaseDynamicControl {
   get configArray(): ARRAY {
     return this.config as ARRAY;
   }
+  constructor(@Optional() @SkipSelf() public parent: DynamicArrayComponent) {
+    super();
+  }
+  get isInsideDynamicArray() {
+    return !!this.parent;
+  }
   private _lastOrder = 0;
   get lastOrder() {
     return this._lastOrder;
@@ -110,7 +115,21 @@ export class DynamicArrayComponent extends BaseDynamicControl {
   }
 
   addCtrl() {
-    const childStructure = this.configArray.childArrayStructure;
+    let childStructure = this.configArray.childArrayStructure;
+    if (!childStructure) {
+      //issue: this condition is respecting the edge case when we have 2 nested formArray to make the (addition-action) work correctly for the newly added controls
+      //need refactoring: when we are gonna have more than two nested formArray /we can still Ascend to the parent until we reach to the root FormArray instead of the direct parent only/
+      childStructure = (
+        (this.parent.config as ARRAY).childArrayStructure as Partial<{
+          childArrayStructure: ChildArrayStructure;
+        }>
+      ).childArrayStructure!;
+      if (!childStructure)
+        throw new Error(
+          '//You should provide childArrayStructure jsonObject in the corresponding json file//'
+        );
+    }
+
     const newCtrl = this.buildDesiredObjectStructure(
       childStructure
     ) as DynamicControl;
@@ -132,7 +151,7 @@ export class DynamicArrayComponent extends BaseDynamicControl {
         order: this.lastOrder,
       };
     } else if (childStructure.controlType === 'group') {
-      let group = childStructure.fields;
+      let group = childStructure.controls;
       let ctrls = {};
       Object.values(group).forEach((ctrl, index) => {
         const ctrlName = Object.keys(group)[index];
@@ -151,7 +170,7 @@ export class DynamicArrayComponent extends BaseDynamicControl {
         controls: ctrls,
       };
     } else if (childStructure.controlType === 'array') {
-      let array = childStructure.fields;
+      let array = childStructure.controls;
       let ctrls: ARRAY['controls'] = [];
       array.forEach((ctrl, index) => {
         ctrls.push(

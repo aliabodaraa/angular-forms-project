@@ -19,22 +19,10 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {
-  ARRAY,
-  CHECKBOX,
-  DynamicControl,
-  GROUP,
-  HAS_VALUE,
-  INPUT,
-  RADIO,
-  SELECT,
-} from '../dynamic-forms.model';
+import { DynamicControl, HAS_VALUE } from '../dynamic-forms.model';
 import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
 import { banWords } from '../validators/ban-words.validator';
 
-interface ControlWithValue {
-  value: string | number | boolean;
-}
 export const comparatorFn = (
   a: KeyValue<string, DynamicControl>,
   b: KeyValue<string, DynamicControl>
@@ -68,7 +56,7 @@ export class BaseDynamicControl implements OnInit {
       this.formControl.setValidators(this.resolveValidators(this.config));
     }
   }
-  protected ngZone = inject(NgZone);
+
   protected parentGroupDir = inject(ControlContainer);
 
   ngOnInit() {
@@ -112,24 +100,6 @@ export class BaseDynamicControl implements OnInit {
     );
   }
 
-  isGroup(d: DynamicControl): d is GROUP {
-    return d.controlType === 'group';
-  }
-  isArray(d: DynamicControl): d is ARRAY {
-    return d.controlType === 'array';
-  }
-  isInput(d: DynamicControl): d is INPUT {
-    return d.controlType === 'input';
-  }
-  isSelect(d: DynamicControl): d is SELECT {
-    return d.controlType === 'select';
-  }
-  isCheckbox(d: DynamicControl): d is CHECKBOX {
-    return d.controlType === 'checkbox';
-  }
-  isRadio(d: DynamicControl): d is RADIO {
-    return d.controlType === 'radio';
-  }
   hasValue(ctrl: any): ctrl is HAS_VALUE<any> {
     return 'value' in ctrl;
   }

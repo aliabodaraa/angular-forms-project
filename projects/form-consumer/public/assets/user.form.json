@@ -127,7 +127,7 @@
       "childArrayStructure": {
         "defaultCreationLabel": "Nested Array Of Groups",
         "controlType": "group",
-        "fields": {
+        "controls": {
           "label": {
             "controlType": "input",
             "type": "number",
@@ -192,11 +192,11 @@
       "childArrayStructure": {
         "defaultCreationLabel": "Nested Array Of Complex Groups",
         "controlType": "group",
-        "fields": {
+        "controls": {
           "label00": {
             "defaultCreationLabel": "Nested label00",
             "controlType": "group",
-            "fields": {
+            "controls": {
               "label": {
                 "controlType": "input",
                 "type": "number",
@@ -212,7 +212,7 @@
           "phoneNumber00": {
             "defaultCreationLabel": "Nested phoneNumber00",
             "controlType": "group",
-            "fields": {
+            "controls": {
               "label": {
                 "controlType": "input",
                 "type": "number",
@@ -284,28 +284,54 @@
       "childArrayStructure": {
         "defaultCreationLabel": "Array Of Array",
         "controlType": "array",
-        "isRemovable": false,
-        "isAddable": false,
-        "fields": [
+        "isRemovable": true,
+        "isAddable": true,
+        "childArrayStructure": {
+          "controlType": "input",
+          "type": "number",
+          "defaultCreationValue": 22
+        },
+        "controls": [
           {
             "controlType": "input",
             "type": "number",
-            "defaultCreationValue": 2
+            "defaultCreationValue": "0944661224"
+          },
+          {
+            "controlType": "input",
+            "type": "number",
+            "defaultCreationValue": "0944661224"
           }
         ]
       },
       "controls": [
         {
           "controlType": "array",
-          "isRemovable": false,
-          "isAddable": false,
+          "label": "Array Of Array 1",
+          "isRemovable": true,
+          "isAddable": true,
+          "childArrayStructure": {
+            "controlType": "input",
+            "type": "number",
+            "defaultCreationValue": 11,
+            "note": "we can overide the parent childArrayStructure or still overide it here"
+          },
           "controls": [
             {
               "controlType": "input",
               "label": "phone label 1",
               "value": "0933751751",
               "type": "text",
-              "order": 0
+              "order": 0,
+              "childArrayStructure": "noop"
+            },
+            {
+              "controlType": "input",
+              "label": "phone label 2",
+              "value": "0933751751",
+              "type": "text",
+              "order": 1,
+              "childArrayStructure": "noop"
             }
           ]
         }

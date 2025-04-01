@@ -28,15 +28,13 @@ export interface RADIO extends FIELD {
   controlType: 'radio';
   ctrlValues: any[];
 }
-interface OPTION extends HAS_VALUE<string> {
+interface OPTION<T> extends HAS_VALUE<T> {
   label: string;
 }
-export interface SELECT extends FIELD, HAS_VALUE<any> {
+export interface SELECT<T = string> extends FIELD, HAS_VALUE<any> {
   controlType: 'select';
-  type: string;
-  options: OPTION[];
+  options: OPTION<T>[];
 }
-
 export interface GROUP extends FIELD {
   controlType: 'group';
   controls: Record<string, DynamicControl>;
@@ -55,17 +53,7 @@ export interface DynamicFormConfig {
 }
 
 //---------ChildArrayStructure--------
-export type FieldTypes =
-  | 'input'
-  | 'select'
-  | 'checkbox'
-  | 'radio'
-  | 'group'
-  | 'array';
-interface SelectField {
-  controlType: 'select';
-}
-export type FieldsArrayTypes = 'input' | 'group' | 'array';
+
 type InputTypes =
   | 'text'
   | 'password'
@@ -95,7 +83,7 @@ export interface InputField {
 export interface GroupField {
   controlType: 'group';
   defaultCreationLabel: string;
-  fields: Record<string, InputField> | Record<string, GroupField>;
+  controls: Record<string, InputField> | Record<string, GroupField>;
 }
 
 interface ArrayField {
@@ -103,7 +91,7 @@ interface ArrayField {
   defaultCreationLabel: string;
   isRemovable: boolean;
   isAddable: boolean;
-  fields: InputField[] | GroupField[] | ArrayField[];
+  controls: InputField[] | GroupField[];
 }
 
 export type ChildArrayStructure = InputField | GroupField | ArrayField;
