@@ -280,7 +280,7 @@
     "ArrayNestedComplexArray": {
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
-      "order": 7,
+      "order": 8,
       "childArrayStructure": {
         "defaultCreationLabel": "Array Of Array",
         "controlType": "array",
@@ -334,6 +334,27 @@
               "childArrayStructure": "noop"
             }
           ]
+        }
+      ]
+    },
+    "Gender": {
+      "controlType": "radio",
+      "label": "Gender",
+      "value": "female",
+      "order": 9,
+      "validators": {
+        "required": true
+      },
+      "ctrlValues": [
+        {
+          "label": "Male",
+          "value": "male",
+          "order": 0
+        },
+        {
+          "label": "Female",
+          "value": "female",
+          "order": 1
         }
       ]
     }

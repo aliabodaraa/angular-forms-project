@@ -13,16 +13,16 @@ import { RADIO } from '../dynamic-forms.model';
   imports: [...sharedDynamicControlDeps, ValidatorMessageContainer],
   viewProviders: [dynamicControlProvider],
   template: `
-    <div>
+    <div *ngFor="let ctrl of configRadio?.ctrlValues">
       <input
-        *ngFor="let item of []"
         type="radio"
         [container]="containerDir.container"
         [formControlName]="controlKey"
-        [checked]="configRadio"
-        [id]="controlKey"
+        [id]="ctrl.order"
+        [value]="ctrl.value"
+        [name]="controlKey"
       />
-      <label [for]="controlKey">{{ configRadio?.label }}</label>
+      <label [for]="ctrl.order">{{ ctrl?.label }}</label>
     </div>
     <ng-container
       validatorMessageContainer
@@ -35,6 +35,9 @@ import { RADIO } from '../dynamic-forms.model';
         display: flex;
         align-items: center;
         margin-top: 10px;
+      }
+      :host ::ng-deep app-input-error:not(:first-of-type) {
+        display: none;
       }
     `,
   ],

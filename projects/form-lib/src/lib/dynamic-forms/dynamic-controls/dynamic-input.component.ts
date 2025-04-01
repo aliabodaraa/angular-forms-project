@@ -18,6 +18,7 @@ import { INPUT } from '../dynamic-forms.model';
       [value]="configInput?.value"
       [id]="controlKey"
       [type]="configInput?.type"
+      [name]="controlKey"
     />
   `,
 })

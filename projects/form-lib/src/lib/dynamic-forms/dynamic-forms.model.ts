@@ -17,24 +17,25 @@ export interface HAS_VALUE<T = string | number> {
 }
 export interface INPUT extends FIELD, HAS_VALUE {
   controlType: 'input';
-  type: string;
+  type: 'input';
 }
 
 export interface CHECKBOX extends FIELD, HAS_VALUE<boolean> {
   controlType: 'checkbox';
-  type: string;
+  type: 'checkbox';
 }
-export interface RADIO extends FIELD {
+export interface RADIO<T = string> extends FIELD, HAS_VALUE<T> {
   controlType: 'radio';
-  ctrlValues: any[];
+  ctrlValues: (FIELD & HAS_VALUE<T>)[];
 }
 interface OPTION<T> extends HAS_VALUE<T> {
   label: string;
 }
-export interface SELECT<T = string> extends FIELD, HAS_VALUE<any> {
+export interface SELECT<T = string> extends FIELD, HAS_VALUE<T> {
   controlType: 'select';
   options: OPTION<T>[];
 }
+
 export interface GROUP extends FIELD {
   controlType: 'group';
   controls: Record<string, DynamicControl>;

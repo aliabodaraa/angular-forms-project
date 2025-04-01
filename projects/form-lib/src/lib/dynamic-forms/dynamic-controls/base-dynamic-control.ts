@@ -5,7 +5,6 @@ import {
   HostBinding,
   inject,
   Input,
-  NgZone,
   OnInit,
   SimpleChanges,
   StaticProvider,
