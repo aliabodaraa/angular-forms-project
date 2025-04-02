@@ -53,7 +53,7 @@ export interface DynamicFormConfig {
   controls: Record<string, DynamicControl>;
 }
 
-//---------ChildArrayStructure--------
+//---------The Following Types Made To Achieve StrictTypeing On The Property ChildArrayStructure Get From FormArray Json Config--------
 
 type InputTypes =
   | 'text'
@@ -96,70 +96,3 @@ interface ArrayField {
 }
 
 export type ChildArrayStructure = InputField | GroupField | ArrayField;
-
-//---------ChildArrayStructure--------
-let case1 = {
-  //case 1
-  childArrayStructure: {
-    controlType: 'input',
-    type: 'number',
-  },
-};
-let case2 = {
-  //case 2
-  childArrayStructure: {
-    controlType: 'group',
-    fields: {
-      0: {
-        ctrlName: 'g1',
-        controlType: 'group',
-        label: 'Phone Group 1',
-        order: 0,
-        controls: {
-          label: {
-            controlType: 'input',
-            label: 'phone label 1',
-            value: '0933751751',
-            type: 'text',
-            order: 0,
-          },
-          phoneNumber: {
-            controlType: 'input',
-            label: 'phone 1',
-            value: '0962636524',
-            type: 'number',
-            order: 1,
-          },
-        },
-      },
-    },
-  },
-};
-let case3 = {
-  //case 3
-  childArrayStructure: {
-    controlType: 'array',
-    fields: [
-      {
-        ctrlName: 'c1',
-        controlType: 'input',
-        type: 'number',
-      },
-    ],
-  },
-};
-let case4 = {
-  //case 4
-  childArrayStructure: {
-    controlType: 'array',
-    fields: [
-      [
-        {
-          ctrlName: 'c1',
-          controlType: 'input',
-          type: 'number',
-        },
-      ],
-    ],
-  },
-};

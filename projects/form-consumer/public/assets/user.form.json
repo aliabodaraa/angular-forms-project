@@ -80,14 +80,15 @@
         "requiredTrue": true
       }
     },
-    "ArrayOfControls": {
+    "ArrayWithControls": {
       "controlType": "array",
       "label": "Links to your Phones numbers",
       "order": 5,
       "childArrayStructure": {
         "controlType": "input",
         "type": "number",
-        "defaultCreationValue": 11
+        "defaultCreationValue": 11,
+        "defaultCreationLabel": "label"
       },
       "controls": [
         {
@@ -120,7 +121,7 @@
         }
       ]
     },
-    "ArrayOfGroups": {
+    "ArrayWithGroups": {
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 6,
@@ -131,12 +132,14 @@
           "label": {
             "controlType": "input",
             "type": "number",
-            "defaultCreationValue": 1
+            "defaultCreationValue": 1,
+            "defaultCreationLabel": "phone label"
           },
           "phoneNumber": {
             "controlType": "input",
             "type": "number",
-            "defaultCreationValue": 2
+            "defaultCreationValue": 2,
+            "defaultCreationLabel": "phone label"
           }
         }
       },
@@ -185,7 +188,7 @@
         }
       ]
     },
-    "ArrayOfComplexGroups": {
+    "ArrayWithComplexGroups": {
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 7,
@@ -200,12 +203,14 @@
               "label": {
                 "controlType": "input",
                 "type": "number",
-                "defaultCreationValue": 1
+                "defaultCreationValue": 1,
+                "defaultCreationLabel": "phone label"
               },
               "phoneNumber": {
                 "controlType": "input",
                 "type": "number",
-                "defaultCreationValue": 2
+                "defaultCreationValue": 2,
+                "defaultCreationLabel": "phone label"
               }
             }
           },
@@ -216,12 +221,14 @@
               "label": {
                 "controlType": "input",
                 "type": "number",
-                "defaultCreationValue": 1
+                "defaultCreationValue": 1,
+                "defaultCreationLabel": "phone label"
               },
               "phoneNumber": {
                 "controlType": "input",
                 "type": "number",
-                "defaultCreationValue": 2
+                "defaultCreationValue": 2,
+                "defaultCreationLabel": "phone label"
               }
             }
           }
@@ -277,7 +284,7 @@
         }
       ]
     },
-    "ArrayNestedComplexArray": {
+    "ArrayWithFormArrays": {
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 8,
@@ -322,16 +329,14 @@
               "label": "phone label 1",
               "value": "0933751751",
               "type": "text",
-              "order": 0,
-              "childArrayStructure": "noop"
+              "order": 0
             },
             {
               "controlType": "input",
               "label": "phone label 2",
               "value": "0933751751",
               "type": "text",
-              "order": 1,
-              "childArrayStructure": "noop"
+              "order": 1
             }
           ]
         }
@@ -342,6 +347,7 @@
       "label": "Gender",
       "value": "female",
       "order": 9,
+      "type": "radio",
       "validators": {
         "required": true
       },

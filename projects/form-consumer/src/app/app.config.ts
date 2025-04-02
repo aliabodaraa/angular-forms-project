@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { DynamicValidatorMessage, VALIDATION_ERROR_MESSAGES } from 'form-lib';
+import { VALIDATION_ERROR_MESSAGES } from 'form-lib';
 
 const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   required: () => `This field is required (Custom)`,

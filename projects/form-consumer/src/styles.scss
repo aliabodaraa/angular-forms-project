@@ -4,13 +4,14 @@
 :root {
   --color-primary: #004859;
   --color-accent: #ff8888;
-  --color-accent-secondary: #ffc15a;
-  --color-accent-secondary-darker: #faa415;
+  --color-accent-secondary: #ededed;
+  --color-accent-secondary-darker: #bdbdbd;
   --color-success: #4caf50;
   --color-error: #ff5722;
   --color-info: #449eff;
   --color-background: #eceff1;
   --color-text: #263238;
+  --border-controls-color: #e5e5e5;
   --color-text-light: #607d8b;
   --height-header: 64px;
   --height-footer: 48px;
@@ -93,10 +94,13 @@ button {
     border: var(--color-primary) 1px solid;
   }
 }
-
 input,
 select {
-  border: var(--color-text) solid 2px;
+  outline: none;
+  border: var(--border-controls-color) solid 2px;
+  &:focus {
+    border: var(--color-accent-secondary-darker) solid 2px;
+  }
 }
 
 legend {
