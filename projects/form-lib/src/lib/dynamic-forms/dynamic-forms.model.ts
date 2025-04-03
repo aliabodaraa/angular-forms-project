@@ -5,6 +5,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { Observable, of } from 'rxjs';
 
 type ValidatorKeys = keyof Omit<
   typeof Validators & { banWords: ValidatorFn },
@@ -102,30 +103,74 @@ interface ArrayField {
 }
 
 export type ChildArrayStructure = InputField | GroupField | ArrayField;
-
-type CustomValidatorFn<T> = {
+type SyncValidator<T> = {
   fnName: string;
   fnReturnedType: T;
-  fn: T extends 'VF'
-    ? (...args: any) => ValidatorFn | AsyncValidatorFn
-    : ValidatorFn | AsyncValidatorFn;
+  fn: T extends 'VF' ? (...args: any) => ValidatorFn : ValidatorFn;
+};
+type AsyncValidator<T> = {
+  fnName: string;
+  fnReturnedType: T;
+  fn: T extends 'VF' ? (...args: any) => AsyncValidatorFn : AsyncValidatorFn;
 };
 
 export type CustomValidatorsType = Record<
   string,
-  | CustomValidatorFn<'VF'>
-  | CustomValidatorFn<'VE'>
-  | (CustomValidatorFn<'VF'> | CustomValidatorFn<'VE'>)[]
+  {
+    sync?:
+      | SyncValidator<'VE'>
+      | SyncValidator<'VF'>
+      | (SyncValidator<'VE'> | SyncValidator<'VF'>)[];
+    async?:
+      | AsyncValidator<'VE'>
+      | AsyncValidator<'VF'>
+      | (AsyncValidator<'VE'> | AsyncValidator<'VF'>)[];
+  }
 >;
-
 export function isValidatorFunction(
   fn: any
-): fn is (...args: any[]) => ValidatorFn | AsyncValidatorFn {
+): fn is (...args: any[]) => ValidatorFn | ValidatorFn {
   return typeof fn == 'function'; //it fails ehrn using === !?
 }
-
+export function isAsyncValidatorFunction(
+  fn: any
+): fn is (...args: any[]) => AsyncValidatorFn | AsyncValidatorFn {
+  return typeof fn == 'function'; //it fails ehrn using === !?
+}
 export function isDirectValidator(
   fn: any
 ): fn is ValidatorFn | AsyncValidatorFn {
   return typeof fn == 'function' && fn.length === 1;
 }
+
+let t: CustomValidatorsType = {
+  assassas: {
+    sync: {
+      fn: (bannedWords: string[] = []): ValidatorFn => {
+        return (
+          control: AbstractControl<string | null>
+        ): ValidationErrors | null => {
+          const foundBannedWord = bannedWords.find(
+            (word) => word.toLowerCase() === control.value?.toLowerCase()
+          );
+          return !foundBannedWord
+            ? null
+            : { banWords: { bannedWord: foundBannedWord } };
+        };
+      },
+      fnName: 'uniqueName',
+      fnReturnedType: 'VF',
+    },
+    async: {
+      fnName: 'uniqueName',
+      fnReturnedType: 'VE',
+      fn: (
+        control: AbstractControl<string | null>
+      ):
+        | Promise<ValidationErrors | null>
+        | Observable<ValidationErrors | null> => {
+        return of(null);
+      },
+    },
+  },
+};

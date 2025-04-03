@@ -11,20 +11,24 @@ import {
 } from '@angular/core';
 import {
   AbstractControl,
+  AsyncValidatorFn,
   ControlContainer,
   FormArray,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import {
   CustomValidatorsType,
   DynamicControl,
   HAS_VALUE,
+  isAsyncValidatorFunction,
   isValidatorFunction,
 } from '../dynamic-forms.model';
 import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
+import { Observable, of } from 'rxjs';
 // import { banWords } from '../validators/ban-words.validator';
 
 export const comparatorFn = (
@@ -61,8 +65,18 @@ export class BaseDynamicControl implements OnInit {
     }
     if (changes['customValidators']?.currentValue)
       this.formControl.setValidators(
-        this.resolveValidators(this.controlKey, this.config)
+        this.resolveSyncValidators(this.controlKey, this.config)
       );
+    // if (
+    //   changes['customValidators']?.currentValue &&
+    //   changes['config']?.currentValue
+    // )
+    //   this.formControl.setAsyncValidators(
+    //     this.resolveAsycValidators(
+    //       this.controlKey,
+    //       this.config
+    //     ) as AsyncValidatorFn[]
+    //   );
   }
 
   protected parentGroupDir = inject(ControlContainer);
@@ -81,7 +95,7 @@ export class BaseDynamicControl implements OnInit {
     }
   }
 
-  protected resolveValidators(
+  protected resolveSyncValidators(
     controlKey: string,
     { validators = {} }: DynamicControl
   ) {
@@ -106,11 +120,11 @@ export class BaseDynamicControl implements OnInit {
         //  if (validatorKey === 'banWords' && Array.isArray(validatorValue)) {
         //    return banWords(validatorValue);
         //  }
-        const fnData = Array.isArray(this.customValidators?.[controlKey])
-          ? this.customValidators?.[controlKey]?.find(
+        const fnData = Array.isArray(this.customValidators?.[controlKey]?.sync)
+          ? this.customValidators?.[controlKey]?.sync?.find(
               (item) => item?.fnName === validatorKey
             )
-          : this.customValidators?.[controlKey];
+          : this.customValidators?.[controlKey]?.sync;
         if (fnData?.fn && fnData?.fnName === validatorKey)
           return fnData.fnReturnedType === 'VF' &&
             isValidatorFunction(fnData.fn)
@@ -118,6 +132,28 @@ export class BaseDynamicControl implements OnInit {
             : fnData.fn;
 
         return Validators.nullValidator;
+      }
+    );
+  }
+  protected resolveAsycValidators(
+    controlKey: string,
+    { validators = {} }: DynamicControl
+  ) {
+    return (Object.keys(validators) as Array<keyof typeof validators>).map(
+      (validatorKey) => {
+        const validatorValue = validators[validatorKey];
+
+        const fnData = Array.isArray(this.customValidators?.[controlKey]?.async)
+          ? this.customValidators?.[controlKey]?.async?.find(
+              (item) => item?.fnName === validatorKey
+            )
+          : this.customValidators?.[controlKey]?.async;
+        if (fnData?.fn && fnData?.fnName === validatorKey)
+          return fnData.fnReturnedType === 'VF' &&
+            isAsyncValidatorFunction(fnData.fn)
+            ? fnData.fn(validatorValue)
+            : fnData.fn;
+        return of(null);
       }
     );
   }

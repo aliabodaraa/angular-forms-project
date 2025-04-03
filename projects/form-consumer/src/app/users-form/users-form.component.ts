@@ -42,10 +42,8 @@ export class UsersFormComponent {
     // form.reset();
   }
   fiedsValidators: CustomValidatorsType = {
-    fullName: [
-      {
-        fnName: 'banWords',
-        fnReturnedType: 'VF',
+    fullName: {
+      sync: {
         fn: (bannedWords: string[] = []): ValidatorFn => {
           return (
             control: AbstractControl<string | null>
@@ -58,8 +56,10 @@ export class UsersFormComponent {
               : { banWords: { bannedWord: foundBannedWord } };
           };
         },
+        fnName: 'banWords',
+        fnReturnedType: 'VF',
       },
-      {
+      async: {
         fnName: 'uniqueName',
         fnReturnedType: 'VE',
         fn: (
@@ -79,6 +79,6 @@ export class UsersFormComponent {
             );
         },
       },
-    ],
+    },
   };
 }
