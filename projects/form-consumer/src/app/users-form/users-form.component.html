@@ -1,6 +1,6 @@
 <p>users-form works!</p>
 <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
-  <lib-form>
+  <lib-form [customValidators]="fiedsValidators">
     <cfc-rating-picker formControlName="reviewRating"></cfc-rating-picker>
   </lib-form>
 </form>

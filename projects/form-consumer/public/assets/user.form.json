@@ -10,7 +10,8 @@
       "validators": {
         "required": true,
         "minLength": 2,
-        "banWords": ["Test", "Dummy"]
+        "banWords": ["Test", "Dummy"],
+        "uniqueName": true
       }
     },
     "email": {

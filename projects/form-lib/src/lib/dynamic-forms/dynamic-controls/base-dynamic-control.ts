@@ -18,9 +18,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { DynamicControl, HAS_VALUE } from '../dynamic-forms.model';
+import {
+  CustomValidatorsType,
+  DynamicControl,
+  HAS_VALUE,
+  isValidatorFunction,
+} from '../dynamic-forms.model';
 import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
-import { banWords } from '../validators/ban-words.validator';
+// import { banWords } from '../validators/ban-words.validator';
 
 export const comparatorFn = (
   a: KeyValue<string, DynamicControl>,
@@ -42,6 +47,7 @@ export const dynamicControlProvider: StaticProvider = {
 export class BaseDynamicControl implements OnInit {
   @Input() controlKey: string;
   @Input() config: DynamicControl;
+  @Input() customValidators: CustomValidatorsType;
   @HostBinding('class') hostClass = 'form-field';
 
   cd = inject(ChangeDetectorRef);
@@ -52,8 +58,11 @@ export class BaseDynamicControl implements OnInit {
     if (changes['config']?.currentValue) {
       if (this.hasValue(this.config))
         this.formControl.patchValue(this.config.value);
-      this.formControl.setValidators(this.resolveValidators(this.config));
     }
+    if (changes['customValidators']?.currentValue)
+      this.formControl.setValidators(
+        this.resolveValidators(this.controlKey, this.config)
+      );
   }
 
   protected parentGroupDir = inject(ControlContainer);
@@ -72,7 +81,10 @@ export class BaseDynamicControl implements OnInit {
     }
   }
 
-  protected resolveValidators({ validators = {} }: DynamicControl) {
+  protected resolveValidators(
+    controlKey: string,
+    { validators = {} }: DynamicControl
+  ) {
     return (Object.keys(validators) as Array<keyof typeof validators>).map(
       (validatorKey) => {
         const validatorValue = validators[validatorKey];
@@ -91,9 +103,20 @@ export class BaseDynamicControl implements OnInit {
         ) {
           return Validators.minLength(validatorValue);
         }
-        if (validatorKey === 'banWords' && Array.isArray(validatorValue)) {
-          return banWords(validatorValue);
-        }
+        //  if (validatorKey === 'banWords' && Array.isArray(validatorValue)) {
+        //    return banWords(validatorValue);
+        //  }
+        const fnData = Array.isArray(this.customValidators?.[controlKey])
+          ? this.customValidators?.[controlKey]?.find(
+              (item) => item?.fnName === validatorKey
+            )
+          : this.customValidators?.[controlKey];
+        if (fnData?.fn && fnData?.fnName === validatorKey)
+          return fnData.fnReturnedType === 'VF' &&
+            isValidatorFunction(fnData.fn)
+            ? fnData.fn(validatorValue)
+            : fnData.fn;
+
         return Validators.nullValidator;
       }
     );

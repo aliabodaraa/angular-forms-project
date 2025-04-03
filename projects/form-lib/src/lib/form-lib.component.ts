@@ -4,7 +4,7 @@ import {
   ChangeDetectorRef,
   Component,
   inject,
-  OnDestroy,
+  Input,
   OnInit,
 } from '@angular/core';
 import { LIB_CONFIG } from './lib-config';
@@ -14,9 +14,9 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { DynamicControlResolver } from './dynamic-forms/dynamic-control-resolver.service';
-import { ControlInjectorPipe } from './dynamic-forms/control-injector.pipe';
 import { comparatorFn } from './dynamic-forms/dynamic-controls/base-dynamic-control';
-import { bufferCount, filter, Subject, take, takeUntil } from 'rxjs';
+import { bufferCount, filter, take } from 'rxjs';
+import { CustomValidatorsType } from './dynamic-forms';
 
 @Component({
   selector: 'lib-form',
@@ -38,7 +38,8 @@ import { bufferCount, filter, Subject, take, takeUntil } from 'rxjs';
           [ngComponentOutlet]="componentType"
           [ngComponentOutletInputs]="{
             controlKey: control.key,
-            config: control.value
+            config: control.value,
+            customValidators: customValidators
           }"
         ></ng-container>
       </ng-container>
@@ -86,4 +87,5 @@ export class FormLibComponent implements OnInit {
         this.cdr.detectChanges();
       });
   }
+  @Input() customValidators: CustomValidatorsType;
 }

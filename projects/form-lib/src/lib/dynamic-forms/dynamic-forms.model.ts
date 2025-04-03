@@ -1,4 +1,10 @@
-import { ValidatorFn, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  AsyncValidatorFn,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 
 type ValidatorKeys = keyof Omit<
   typeof Validators & { banWords: ValidatorFn },
@@ -96,3 +102,30 @@ interface ArrayField {
 }
 
 export type ChildArrayStructure = InputField | GroupField | ArrayField;
+
+type CustomValidatorFn<T> = {
+  fnName: string;
+  fnReturnedType: T;
+  fn: T extends 'VF'
+    ? (...args: any) => ValidatorFn | AsyncValidatorFn
+    : ValidatorFn | AsyncValidatorFn;
+};
+
+export type CustomValidatorsType = Record<
+  string,
+  | CustomValidatorFn<'VF'>
+  | CustomValidatorFn<'VE'>
+  | (CustomValidatorFn<'VF'> | CustomValidatorFn<'VE'>)[]
+>;
+
+export function isValidatorFunction(
+  fn: any
+): fn is (...args: any[]) => ValidatorFn | AsyncValidatorFn {
+  return typeof fn == 'function'; //it fails ehrn using === !?
+}
+
+export function isDirectValidator(
+  fn: any
+): fn is ValidatorFn | AsyncValidatorFn {
+  return typeof fn == 'function' && fn.length === 1;
+}
