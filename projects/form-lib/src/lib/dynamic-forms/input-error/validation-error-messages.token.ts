@@ -13,6 +13,7 @@ export const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   pattern: () => `Wrong format`,
   appUniqueNickname: () => `Nickname is taken`,
   uniqueName: () => `Nickname is taken`,
+  checking: () => 'Checking...',
 };
 
 export const VALIDATION_ERROR_MESSAGES = new InjectionToken(

@@ -118,11 +118,13 @@ type SyncValidator<T> = {
   fnName: string;
   fnReturnedType: T;
   fn: T extends 'VF' ? (...args: any) => ValidatorFn : ValidatorFn;
+  validatorParam?: any;
 };
 type AsyncValidator<T> = {
   fnName: string;
   fnReturnedType: T;
   fn: T extends 'VF' ? (...args: any) => AsyncValidatorFn : AsyncValidatorFn;
+  validatorParam?: any;
 };
 
 export type CustomValidatorsType = Record<
@@ -138,50 +140,35 @@ export type CustomValidatorsType = Record<
       | (AsyncValidator<'VE'> | AsyncValidator<'VF'>)[];
   }
 >;
-export function isValidatorFunction(
-  fn: any
-): fn is ((...args: any[]) => ValidatorFn) | ValidatorFn {
-  return typeof fn == 'function'; //it fails ehrn using === !?
-}
-export function isAsyncValidatorFunction(
-  fn: any
-): fn is ((...args: any[]) => AsyncValidatorFn) | AsyncValidatorFn {
-  return typeof fn == 'function'; //it fails ehrn using === !?
-}
-export function isDirectValidator(
-  fn: any
-): fn is ValidatorFn | AsyncValidatorFn {
-  return typeof fn == 'function' && fn.length === 1;
-}
 
-let t: CustomValidatorsType = {
-  assassas: {
-    sync: {
-      fn: (bannedWords: string[] = []): ValidatorFn => {
-        return (
-          control: AbstractControl<string | null>
-        ): ValidationErrors | null => {
-          const foundBannedWord = bannedWords.find(
-            (word) => word.toLowerCase() === control.value?.toLowerCase()
-          );
-          return !foundBannedWord
-            ? null
-            : { banWords: { bannedWord: foundBannedWord } };
-        };
-      },
-      fnName: 'uniqueName',
-      fnReturnedType: 'VF',
-    },
-    async: {
-      fnName: 'uniqueName',
-      fnReturnedType: 'VE',
-      fn: (
-        control: AbstractControl<string | null>
-      ):
-        | Promise<ValidationErrors | null>
-        | Observable<ValidationErrors | null> => {
-        return of(null);
-      },
-    },
-  },
-};
+// let t: CustomValidatorsType = {
+//   assassas: {
+//     sync: {
+//       fn: (bannedWords: string[] = []): ValidatorFn => {
+//         return (
+//           control: AbstractControl<string | null>
+//         ): ValidationErrors | null => {
+//           const foundBannedWord = bannedWords.find(
+//             (word) => word.toLowerCase() === control.value?.toLowerCase()
+//           );
+//           return !foundBannedWord
+//             ? null
+//             : { banWords: { bannedWord: foundBannedWord } };
+//         };
+//       },
+//       fnName: 'uniqueName',
+//       fnReturnedType: 'VF',
+//     },
+//     async: {
+//       fnName: 'uniqueName',
+//       fnReturnedType: 'VE',
+//       fn: (
+//         control: AbstractControl<string | null>
+//       ):
+//         | Promise<ValidationErrors | null>
+//         | Observable<ValidationErrors | null> => {
+//         return of(null);
+//       },
+//     },
+//   },
+// };

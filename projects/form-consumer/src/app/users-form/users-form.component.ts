@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -41,23 +41,31 @@ export class UsersFormComponent {
     console.log('Submitted data: ', form.value);
     // form.reset();
   }
+  cd = inject(ChangeDetectorRef);
+  addToArray() {
+    console.log('aaaaaaaaaaaaaaaaa');
+    this.banWordsArray.push('ali1');
+    this.fiedsValidators = JSON.parse(JSON.stringify(this.fiedsValidators));
+  }
+  banWordsArray = ['ali'];
+  bannedWordsFn(bannedWords: string[] = []) {
+    return (
+      control: AbstractControl<string | null>
+    ): ValidationErrors | null => {
+      const foundBannedWord = bannedWords.find(
+        (word) => word.toLowerCase() === control.value?.toLowerCase()
+      );
+      return !foundBannedWord
+        ? null
+        : { banWords: { bannedWord: foundBannedWord } };
+    };
+  }
   fiedsValidators: CustomValidatorsType = {
     fullName: {
       sync: {
-        fn: (bannedWords: string[] = []): ValidatorFn => {
-          return (
-            control: AbstractControl<string | null>
-          ): ValidationErrors | null => {
-            const foundBannedWord = bannedWords.find(
-              (word) => word.toLowerCase() === control.value?.toLowerCase()
-            );
-            return !foundBannedWord
-              ? null
-              : { banWords: { bannedWord: foundBannedWord } };
-          };
-        },
+        fn: this.bannedWordsFn(this.banWordsArray),
         fnName: 'banWords',
-        fnReturnedType: 'VF',
+        fnReturnedType: 'VE',
       },
       async: {
         fnName: 'uniqueName',
