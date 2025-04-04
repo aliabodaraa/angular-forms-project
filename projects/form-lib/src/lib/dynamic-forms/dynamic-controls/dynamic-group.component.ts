@@ -27,10 +27,9 @@ import { GROUP } from '../dynamic-forms.model';
       >
         <ng-container
           *ngIf="
-            controlResolver.resolve(control.value.controlType)
-              | async as componentType
+            controlResolver.resolve(control.value) | async as componentInstance
           "
-          [ngComponentOutlet]="componentType"
+          [ngComponentOutlet]="componentInstance"
           [ngComponentOutletInputs]="{
             controlKey: control.key,
             config: control.value

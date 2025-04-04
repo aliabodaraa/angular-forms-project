@@ -32,8 +32,7 @@ import { CustomValidatorsType } from './dynamic-forms';
       >
         <ng-container
           *ngIf="
-            controlResolver.resolve(control.value.controlType)
-              | async as componentType
+            controlResolver.resolve(control.value) | async as componentType
           "
           [ngComponentOutlet]="componentType"
           [ngComponentOutletInputs]="{

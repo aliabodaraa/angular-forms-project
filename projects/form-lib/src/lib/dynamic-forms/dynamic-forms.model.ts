@@ -54,6 +54,10 @@ export interface SELECT<T = string> extends FIELD, HAS_VALUE<T> {
   options: OPTION<T>[];
 }
 
+export interface CUSTOM extends FIELD {
+  controlType: 'custom';
+  template: string;
+}
 export interface GROUP extends FIELD {
   controlType: 'group';
   controls: Record<string, DynamicControl>;
@@ -65,7 +69,14 @@ export interface ARRAY extends FIELD {
   childArrayStructure: ChildArrayStructure;
   controls: DynamicControl[];
 }
-export type DynamicControl = INPUT | CHECKBOX | RADIO | SELECT | GROUP | ARRAY;
+export type DynamicControl =
+  | INPUT
+  | CHECKBOX
+  | RADIO
+  | SELECT
+  | GROUP
+  | ARRAY
+  | CUSTOM;
 export interface DynamicFormConfig {
   description: string;
   controls: Record<string, DynamicControl>;

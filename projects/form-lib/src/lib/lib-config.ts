@@ -1,4 +1,4 @@
-import { InjectionToken } from '@angular/core';
+import { InjectionToken, Type } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DynamicFormConfig } from './dynamic-forms/dynamic-forms.model';
 import { HttpClient } from '@angular/common/http';
@@ -14,3 +14,7 @@ export function jsonFileProvider(path: string): FactoryProvider {
     useFactory: () => inject(HttpClient).get<DynamicFormConfig>(path),
   };
 }
+
+export const CUSTOM_CONTROLS_COMPONENTS = new InjectionToken<
+  Map<string, Type<any>>[]
+>('CUSTOM_CONTROLS_COMPONENTS');

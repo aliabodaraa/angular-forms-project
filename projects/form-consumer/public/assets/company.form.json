@@ -18,6 +18,14 @@
       "value": "",
       "order": 1
     },
+    "picker": {
+      "controlType": "custom",
+      "template": "picker",
+      "type": "tel",
+      "label": "Phone Number",
+      "value": "",
+      "order": 1
+    },
     "size": {
       "controlType": "select",
       "label": "Company Size",

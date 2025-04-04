@@ -1,8 +1,12 @@
-import { Injectable, Type } from '@angular/core';
-import { from, of, tap } from 'rxjs';
-import { DynamicControl } from './dynamic-forms.model';
+import { Inject, Injectable, Optional, Type } from '@angular/core';
+import { from, Observable, of, tap } from 'rxjs';
+import { CUSTOM, DynamicControl } from './dynamic-forms.model';
+import { CUSTOM_CONTROLS_COMPONENTS } from '../lib-config';
+
 type DynamicControlsMap = {
-  [T in DynamicControl['controlType']]: () => Promise<Type<any>>;
+  [T in Exclude<DynamicControl['controlType'], 'custom'>]: (
+    path?: string
+  ) => Promise<Type<any>>;
 };
 
 @Injectable({
@@ -35,12 +39,23 @@ export class DynamicControlResolver {
         (c) => c.DynamicArrayComponent
       ),
   };
-  constructor() {
+  constructor(
+    @Optional()
+    @Inject(CUSTOM_CONTROLS_COMPONENTS)
+    private customControls: Map<string, Type<any>>
+  ) {
     console.log('out constructor');
   }
   private loadedControlComponents = new Map<string, Type<any>>();
 
-  resolve(controlType: keyof DynamicControlsMap) {
+  resolve(control: DynamicControl) {
+    if (control.controlType == 'custom') {
+      return this.resolveCustomControls(control);
+    }
+    return this.resolveBuiltInControls(control.controlType);
+  }
+
+  private resolveBuiltInControls(controlType: keyof DynamicControlsMap) {
     const loadedComponent = this.loadedControlComponents.get(controlType);
     if (loadedComponent) {
       return of(loadedComponent);
@@ -48,5 +63,21 @@ export class DynamicControlResolver {
     return from(this.lazyControlComponents[controlType]()).pipe(
       tap((comp) => this.loadedControlComponents.set(controlType, comp))
     );
+  }
+
+  private resolveCustomControls(
+    control: CUSTOM
+  ): Observable<Type<any>> | never {
+    if (this.customControls) {
+      const isRegistered: boolean = Array.from(
+        this.customControls.keys()
+      ).includes(control.template);
+      if (isRegistered) {
+        return of(this.customControls.get(control.template)!);
+      }
+      throw `The custom control with this template: (${control.template}) doesn't register any constructor.`;
+    }
+
+    throw `No Registry provided for custom components!`;
   }
 }

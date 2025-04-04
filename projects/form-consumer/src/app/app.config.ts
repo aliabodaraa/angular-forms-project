@@ -4,7 +4,11 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { VALIDATION_ERROR_MESSAGES } from 'form-lib';
+import {
+  CUSTOM_CONTROLS_COMPONENTS,
+  VALIDATION_ERROR_MESSAGES,
+} from 'form-lib';
+import { RatingPickerPageComponent } from './custom-rating-picker/rating-picker-page/rating-picker-page.component';
 
 const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   required: () => `This field is required (Custom)`,
@@ -30,5 +34,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideAnimations(),
     { provide: VALIDATION_ERROR_MESSAGES, useValue: ERROR_MESSAGES },
+    {
+      provide: CUSTOM_CONTROLS_COMPONENTS,
+      useValue: new Map([['picker', RatingPickerPageComponent]]),
+    },
   ],
 };

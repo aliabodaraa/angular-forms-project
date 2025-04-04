@@ -47,8 +47,7 @@ import {
         <div style="display:flex;gap: 5px;">
           <ng-container
             *ngIf="
-              controlResolver.resolve(control.value.controlType)
-                | async as componentType
+              controlResolver.resolve(control.value) | async as componentType
             "
             [ngComponentOutlet]="componentType"
             [ngComponentOutletInputs]="{
