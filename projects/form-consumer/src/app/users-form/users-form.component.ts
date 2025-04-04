@@ -83,7 +83,7 @@ export class UsersFormComponent {
               map((users) =>
                 users.length === 0 ? null : { uniqueName: { isTaken: true } }
               ),
-              catchError(() => of({ uniqueName: { unknownError: true } }))
+              catchError(() => of({ networkError: { unknownError: true } }))
             );
         },
       },

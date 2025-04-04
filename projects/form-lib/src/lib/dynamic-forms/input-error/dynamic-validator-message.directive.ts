@@ -57,17 +57,8 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
   private componentRef: ComponentRef<InputErrorComponent> | null = null;
   private errorMessageTrigger!: Subscription;
   private parentContainer = inject(ControlContainer, { optional: true });
-  private isControlPendingStatus: boolean = false;
-  private controlPendingStatusSubscription: Subscription;
 
   ngOnInit() {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    if (this.ngControl)
-      this.ngControl.statusChanges?.subscribe((status) => {
-        console.log('--', status);
-        this.isControlPendingStatus = status === 'PENDING';
-      });
     queueMicrotask(() => {
       if (!this.ngControl.control)
         throw Error(`No control model for ${this.ngControl.name} control...`);
@@ -80,7 +71,7 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
           startWith(this.ngControl.control.status),
           skip(this.ngControl instanceof NgModel ? 1 : 0)
         )
-        .subscribe(() => {
+        .subscribe((res) => {
           if (
             this.errorStateMatcher.isErrorVisible(
               this.ngControl.control,
@@ -93,6 +84,10 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
               this.componentRef.changeDetectorRef.markForCheck();
             }
             this.componentRef.setInput('errors', this.ngControl.errors);
+            this.componentRef.setInput(
+              'isControlPending',
+              this.ngControl.control?.pending
+            );
           } else {
             this.componentRef?.destroy();
             this.componentRef = null;
@@ -102,6 +97,5 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.errorMessageTrigger.unsubscribe();
-    this.controlPendingStatusSubscription.unsubscribe();
   }
 }

@@ -9,12 +9,17 @@ import { ErrorMessagePipe } from './error-message.pipe';
   imports: [CommonModule, ErrorMessagePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div
-      *ngFor="let error of errors | keyvalue; trackBy: trackByFn"
-      class="input-error"
-    >
-      {{ error.key | errorMessage : error.value }}
-    </div>
+    <ng-container *ngIf="isControlPending; else errors">
+      {{ 'checking' | errorMessage : true }}
+    </ng-container>
+    <ng-template #errors>
+      <div
+        *ngFor="let error of errors | keyvalue; trackBy: trackByFn"
+        class="input-error"
+      >
+        {{ error.key | errorMessage : error.value }}
+      </div>
+    </ng-template>
   `,
   styles: [
     `
@@ -27,7 +32,8 @@ import { ErrorMessagePipe } from './error-message.pipe';
 export class InputErrorComponent {
   @Input()
   errors: ValidationErrors | undefined | null = null;
-
+  @Input()
+  isControlPending: boolean = false;
   trackByFn(index: number, item: KeyValue<string, any>) {
     return item.key;
   }

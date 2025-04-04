@@ -14,6 +14,7 @@ export const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   appUniqueNickname: () => `Nickname is taken`,
   uniqueName: () => `Nickname is taken`,
   checking: () => 'Checking...',
+  networkError: () => 'Network Error...',
 };
 
 export const VALIDATION_ERROR_MESSAGES = new InjectionToken(
