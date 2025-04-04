@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   BaseDynamicControl,
   dynamicControlProvider,
@@ -41,6 +41,7 @@ import { RADIO } from '../dynamic-forms.model';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicRadioComponent extends BaseDynamicControl {
   get configRadio(): RADIO | null {

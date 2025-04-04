@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 
-type ValidatorKeys = keyof Omit<
+export type ValidatorKeys = keyof Omit<
   typeof Validators & { banWords: ValidatorFn },
   'prototype' | 'compose' | 'composeAsync'
 >;
@@ -18,9 +18,20 @@ interface FIELD {
   validators?: {
     [key in ValidatorKeys]?: unknown;
   };
+  asyncValidators?: {
+    [key: string]: unknown;
+  };
 }
 export interface HAS_VALUE<T = string | number> {
   value: T;
+}
+export interface HAS_Validators<T = unknown> {
+  validators: {
+    [key in ValidatorKeys]?: T;
+  };
+}
+export interface HAS_AsyncValidators<T = unknown> {
+  asyncValidators: T;
 }
 export interface INPUT extends FIELD, HAS_VALUE {
   controlType: 'input';
@@ -129,12 +140,12 @@ export type CustomValidatorsType = Record<
 >;
 export function isValidatorFunction(
   fn: any
-): fn is (...args: any[]) => ValidatorFn | ValidatorFn {
+): fn is ((...args: any[]) => ValidatorFn) | ValidatorFn {
   return typeof fn == 'function'; //it fails ehrn using === !?
 }
 export function isAsyncValidatorFunction(
   fn: any
-): fn is (...args: any[]) => AsyncValidatorFn | AsyncValidatorFn {
+): fn is ((...args: any[]) => AsyncValidatorFn) | AsyncValidatorFn {
   return typeof fn == 'function'; //it fails ehrn using === !?
 }
 export function isDirectValidator(

@@ -10,7 +10,9 @@
       "validators": {
         "required": true,
         "minLength": 2,
-        "banWords": ["Test", "Dummy"],
+        "banWords": ["Test", "Dummy"]
+      },
+      "asyncValidators": {
         "uniqueName": true
       }
     },

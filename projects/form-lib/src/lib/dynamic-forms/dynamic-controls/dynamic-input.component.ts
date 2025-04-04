@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   BaseDynamicControl,
   dynamicControlProvider,
@@ -20,6 +20,7 @@ import { INPUT } from '../dynamic-forms.model';
       [type]="configInput?.type"
     />
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicInputComponent extends BaseDynamicControl {
   get configInput(): INPUT | null {

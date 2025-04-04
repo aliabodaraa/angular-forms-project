@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   BaseDynamicControl,
   dynamicControlProvider,
@@ -37,6 +37,7 @@ import { CHECKBOX } from '../dynamic-forms.model';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicCheckboxComponent extends BaseDynamicControl {
   get configCheckbox(): CHECKBOX {

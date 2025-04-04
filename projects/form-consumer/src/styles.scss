@@ -129,7 +129,9 @@ select {
   ):not([formArrayName]):not(form):not([formGroupName="group"]) {
   border: 2px solid var(--color-error);
 }
-
+input.ng-pending {
+  border: 2px solid var(--color-info);
+}
 button[disabled] {
   background-color: rgba(0, 0, 0, 0.15);
   border-color: rgba(0, 0, 0, 0.1);

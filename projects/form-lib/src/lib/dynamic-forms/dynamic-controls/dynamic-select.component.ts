@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   BaseDynamicControl,
   dynamicControlProvider,
@@ -26,6 +26,7 @@ import { SELECT } from '../dynamic-forms.model';
       </option>
     </select>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicSelectComponent extends BaseDynamicControl {
   get configSelect(): SELECT | null {
