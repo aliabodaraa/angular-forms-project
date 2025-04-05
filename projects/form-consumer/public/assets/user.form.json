@@ -6,15 +6,7 @@
       "type": "text",
       "label": "Full Name",
       "value": "aliabodraa@yahoo.com",
-      "order": 0,
-      "validators": {
-        "required": true,
-        "minLength": 2,
-        "banWords": ["Test", "Dummy"]
-      },
-      "asyncValidators": {
-        "uniqueName": "custom"
-      }
+      "order": 0
     },
     "email": {
       "controlType": "input",

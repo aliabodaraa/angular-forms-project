@@ -73,13 +73,12 @@ export class BaseDynamicControl implements OnInit {
           )
         );
 
-        if (providedAsyncValidators?.async)
-          this.formControl.setAsyncValidators(
-            this.resolveAsycValidators(
-              providedAsyncValidators.async,
-              config.asyncValidators
-            )
-          );
+        this.formControl.setAsyncValidators(
+          this.resolveAsycValidators(
+            providedAsyncValidators?.async,
+            config.asyncValidators
+          )
+        );
       }
     }
   }
@@ -102,14 +101,12 @@ export class BaseDynamicControl implements OnInit {
 
   protected resolveSyncValidators(
     customSyncValidators: CustomValidatorsType[any]['sync'],
-    jsonAsyncValidators = {}
+    jsonValidators: { [key: string]: unknown } | undefined = {}
   ) {
-    return (
-      Object.keys(jsonAsyncValidators) as Array<
-        keyof typeof jsonAsyncValidators
-      >
+    let validatorsArray = (
+      Object.keys(jsonValidators) as Array<keyof typeof jsonValidators>
     ).map((validatorKey) => {
-      const jsonValidatorValue = jsonAsyncValidators[validatorKey];
+      const jsonValidatorValue = jsonValidators[validatorKey];
       if (validatorKey === 'required') {
         return Validators.required;
       }
@@ -125,72 +122,51 @@ export class BaseDynamicControl implements OnInit {
       ) {
         return Validators.minLength(jsonValidatorValue);
       }
-      //  if (validatorKey === 'banWords' && Array.isArray(jsonValidatorValue)) {
-      //    return banWords(jsonValidatorValue);
-      //  }
-      let fnData = null;
-      if (customSyncValidators)
-        if (Array.isArray(customSyncValidators))
-          fnData = customSyncValidators?.find(
-            (item) => item?.fnName === validatorKey
-          );
-        else if (Object.keys(customSyncValidators).length)
-          fnData = customSyncValidators;
-
-      if (fnData && fnData.fnName === validatorKey)
-        return fnData.fnReturnedType === 'VF'
-          ? fnData.fn(fnData.validatorParam || jsonValidatorValue)
-          : fnData.fn;
 
       return Validators.nullValidator;
     });
+
+    if (customSyncValidators && Object.keys(customSyncValidators).length) {
+      let sv = Array.isArray(customSyncValidators)
+        ? customSyncValidators
+        : [customSyncValidators];
+      sv.forEach((customSync) => {
+        validatorsArray.push(
+          customSync.fnReturnedType === 'VF'
+            ? customSync.fn(
+                customSync.validatorParam || jsonValidators[customSync.fnName]
+              )
+            : customSync.fn
+        );
+      });
+    }
+
+    return validatorsArray;
   }
 
   protected resolveAsycValidators(
     customAsyncValidators: CustomValidatorsType[any]['async'],
-    jsonAsyncValidators: { [key: string]: unknown } | undefined
+    jsonAsyncValidators: { [key: string]: unknown } = {}
   ) {
-    return (
-      Object.keys(jsonAsyncValidators || {}) as Array<
-        keyof typeof jsonAsyncValidators
-      >
-    ).map((validatorKey) => {
-      const jsonValidatorValue = jsonAsyncValidators?.[validatorKey];
+    if (customAsyncValidators && Object.keys(customAsyncValidators).length) {
+      let av = Array.isArray(customAsyncValidators)
+        ? customAsyncValidators
+        : [customAsyncValidators];
 
-      let fnData = null;
-      if (customAsyncValidators)
-        if (Array.isArray(customAsyncValidators))
-          fnData = customAsyncValidators?.find(
-            (item) => item?.fnName === validatorKey
-          );
-        else if (Object.keys(customAsyncValidators).length)
-          fnData = customAsyncValidators;
-
-      if (fnData && fnData.fnName === validatorKey)
-        return fnData.fnReturnedType === 'VF'
-          ? fnData.fn(fnData?.validatorParam || jsonValidatorValue)
-          : (fnData.fn as AsyncValidatorFn);
-
-      return (control: AbstractControl) => of(null);
-    });
+      return av.map((customAsync) => {
+        return customAsync.fnReturnedType === 'VF'
+          ? customAsync.fn(
+              customAsync.validatorParam ||
+                jsonAsyncValidators[customAsync.fnName]
+            )
+          : (customAsync.fn as AsyncValidatorFn);
+      });
+    }
+    return (_: AbstractControl) => of(null);
   }
 
   hasValue(ctrl: any): ctrl is HAS_VALUE<any> {
     let s: AsyncValidatorFn = (control: AbstractControl) => of(null);
     return 'value' in ctrl;
-  }
-  hasSyncValidators(ctrl: any): ctrl is {
-    validators: {
-      [key in ValidatorKeys]: unknown;
-    };
-  } {
-    return 'validators' in ctrl;
-  }
-  hasAsyncValidators(ctrl: any): ctrl is {
-    asyncValidators: {
-      [key: string]: unknown;
-    };
-  } {
-    return 'asyncValidators' in ctrl;
   }
 }

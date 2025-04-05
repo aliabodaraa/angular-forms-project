@@ -20,7 +20,7 @@ const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   passwordShouldMatch: () => `Password should match (Custom)`,
   pattern: () => `Wrong format (Custom)`,
   appUniqueNickname: () => `Nickname is taken (Custom)`,
-  uniqueName: () => `Nickname is taken (Custom)`,
+  uniqueName: ({ name }) => `Nickname "${name}" is taken`,
 };
 
 export const appConfig: ApplicationConfig = {

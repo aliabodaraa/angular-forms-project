@@ -9,15 +9,17 @@ import { ErrorMessagePipe } from './error-message.pipe';
   imports: [CommonModule, ErrorMessagePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <ng-container *ngIf="isControlPending; else errors">
-      {{ 'checking' | errorMessage : true }}
-    </ng-container>
-    <ng-template #errors>
+    <ng-container *ngIf="!isControlPending; else isPending">
       <div
         *ngFor="let error of errors | keyvalue; trackBy: trackByFn"
         class="input-error"
       >
         {{ error.key | errorMessage : error.value }}
+      </div>
+    </ng-container>
+    <ng-template #isPending>
+      <div class="input-error input-info">
+        {{ 'checking' | errorMessage : true }}
       </div>
     </ng-template>
   `,
