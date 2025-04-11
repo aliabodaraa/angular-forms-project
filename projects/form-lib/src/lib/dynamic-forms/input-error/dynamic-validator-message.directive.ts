@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   ComponentRef,
   Directive,
   ElementRef,
@@ -16,13 +17,17 @@ import {
   NgModel,
 } from '@angular/forms';
 import {
+  delay,
   EMPTY,
   fromEvent,
   iif,
   merge,
   skip,
   startWith,
+  Subject,
   Subscription,
+  take,
+  tap,
 } from 'rxjs';
 import { ErrorStateMatcher } from './error-state-matcher.service';
 import { InputErrorComponent } from './input-error.component';
@@ -53,7 +58,7 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
 
   @Input()
   container = inject(ViewContainerRef);
-
+  private firstRenderStream = new Subject<void>();
   private componentRef: ComponentRef<InputErrorComponent> | null = null;
   private errorMessageTrigger!: Subscription;
   private parentContainer = inject(ControlContainer, { optional: true });
@@ -65,7 +70,8 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
       this.errorMessageTrigger = merge(
         this.ngControl.control.statusChanges,
         fromEvent(this.elementRef.nativeElement, 'blur'),
-        iif(() => !!this.form, this.form!.ngSubmit, EMPTY)
+        iif(() => !!this.form, this.form!.ngSubmit, EMPTY),
+        this.firstRenderStream
       )
         .pipe(
           startWith(this.ngControl.control.status),
@@ -97,5 +103,8 @@ export class DynamicValidatorMessage implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.errorMessageTrigger.unsubscribe();
+  }
+  ngAfterContentInit(): void {
+    setTimeout(() => this.firstRenderStream.next(), 1000); //___need_refactoring___ here ,becasuse we need to emit our value after all the control take its value
   }
 }

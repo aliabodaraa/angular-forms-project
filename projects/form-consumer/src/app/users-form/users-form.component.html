@@ -2,7 +2,7 @@
 <!-- <button (click)="addToArray()">addToArray</button> -->
 
 <form [formGroup]="form" (ngSubmit)="onSubmit(form)">
-  <lib-form [customValidators]="fiedsValidators">
+  <lib-form [customValidators]="fiedsValidators" [values]="data">
     <cfc-rating-picker formControlName="reviewRating"></cfc-rating-picker>
   </lib-form>
 </form>

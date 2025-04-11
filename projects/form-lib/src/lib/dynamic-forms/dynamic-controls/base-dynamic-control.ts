@@ -48,7 +48,9 @@ export const dynamicControlProvider: StaticProvider = {
 export class BaseDynamicControl implements OnInit {
   @Input() controlKey: string;
   @Input() config: DynamicControl;
-  @Input() customValidators: CustomValidatorsType;
+  @Input() customValidators: CustomValidatorsType = {};
+  @Input() values: any;
+
   @HostBinding('class') hostClass = 'form-field';
 
   cd = inject(ChangeDetectorRef);
@@ -57,27 +59,23 @@ export class BaseDynamicControl implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     const config: DynamicControl = changes['config']?.currentValue;
-    const customValidators = changes['customValidators']
-      ?.currentValue as CustomValidatorsType;
     const controlKey = changes['controlKey']?.currentValue as string;
-
-    if (config) {
-      if (this.hasValue(config)) this.formControl.patchValue(config.value);
+    const values = changes['values']?.currentValue || {};
+    if (config && controlKey) {
+      if (Object.keys(values).length)
+        this.formControl.patchValue(values[controlKey]);
+      else if (this.hasValue(config)) this.formControl.patchValue(config.value);
+      const customValidators = changes['customValidators']
+        ?.currentValue as CustomValidatorsType;
       if (customValidators && controlKey) {
-        const providedAsyncValidators = customValidators?.[controlKey];
+        const { sync, async } = customValidators?.[controlKey] ?? {};
 
         this.formControl.setValidators(
-          this.resolveSyncValidators(
-            providedAsyncValidators?.sync,
-            config.validators
-          )
+          this.resolveSyncValidators(sync, config.validators)
         );
 
         this.formControl.setAsyncValidators(
-          this.resolveAsycValidators(
-            providedAsyncValidators?.async,
-            config.asyncValidators
-          )
+          this.resolveAsycValidators(async, config.asyncValidators)
         );
       }
     }
@@ -166,7 +164,6 @@ export class BaseDynamicControl implements OnInit {
   }
 
   hasValue(ctrl: any): ctrl is HAS_VALUE<any> {
-    let s: AsyncValidatorFn = (control: AbstractControl) => of(null);
     return 'value' in ctrl;
   }
 }

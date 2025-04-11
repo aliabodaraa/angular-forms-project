@@ -38,7 +38,8 @@ import { CustomValidatorsType } from './dynamic-forms';
           [ngComponentOutletInputs]="{
             controlKey: control.key,
             config: control.value,
-            customValidators: customValidators
+            customValidators: customValidators,
+            values
           }"
         ></ng-container>
       </ng-container>
@@ -87,4 +88,8 @@ export class FormLibComponent implements OnInit {
       });
   }
   @Input() customValidators: CustomValidatorsType;
+  @Input() values: any;
+  get updateMode() {
+    return !!this.values;
+  }
 }

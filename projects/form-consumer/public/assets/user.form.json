@@ -5,8 +5,11 @@
       "controlType": "input",
       "type": "text",
       "label": "Full Name",
-      "value": "aliabodraa@yahoo.com",
-      "order": 0
+      "value": "ali100",
+      "order": 0,
+      "validators": {
+        "required": true
+      }
     },
     "email": {
       "controlType": "input",

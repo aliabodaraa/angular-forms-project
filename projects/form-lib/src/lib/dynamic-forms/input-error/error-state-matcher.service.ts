@@ -19,7 +19,8 @@ export class ErrorStateMatcher implements ErrorStateMatcher {
     return Boolean(
       control &&
         ((control.invalid && (control.dirty || (form && form.submitted))) ||
-          control.pending)
+          (control.dirty && control.pending) ||
+          (control.invalid && control.pristine))
     );
   }
 }

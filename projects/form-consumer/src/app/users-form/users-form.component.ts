@@ -17,7 +17,15 @@ import {
   jsonFileProvider,
   RatingPickerComponent,
 } from 'form-lib';
-import { catchError, map, Observable, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  map,
+  Observable,
+  of,
+  switchMap,
+  timer,
+} from 'rxjs';
 
 @Component({
   selector: 'app-users-form',
@@ -66,18 +74,22 @@ export class UsersFormComponent {
     ):
       | Promise<ValidationErrors | null>
       | Observable<ValidationErrors | null> => {
-      return this.http
-        .get<unknown[]>(
-          `https://jsonplaceholder.typicode.com/users?username=${control.value}`
+      return timer(400).pipe(
+        switchMap(() =>
+          this.http
+            .get<unknown[]>(
+              `https://jsonplaceholder.typicode.com/users?username=${control.value}`
+            )
+            .pipe(
+              map((users) =>
+                !uniqueNames.includes(control.value!)
+                  ? null
+                  : { uniqueName: { isTaken: true, name: control.value } }
+              ),
+              catchError(() => of({ networkError: { unknownError: true } }))
+            )
         )
-        .pipe(
-          map((users) =>
-            !uniqueNames.includes(control.value!)
-              ? null
-              : { uniqueName: { isTaken: true, name: control.value } }
-          ),
-          catchError(() => of({ networkError: { unknownError: true } }))
-        );
+      );
     };
   }
   fiedsValidators: CustomValidatorsType = {
@@ -95,5 +107,42 @@ export class UsersFormComponent {
         validatorParam: ['ali100', 'ali101'],
       },
     },
+  };
+  data = {
+    Gender: 'female',
+    email: 'aliabodraa@yahoo.com',
+    fullName: 'ali101',
+    reviewRating: 'good',
+    role: 'editor',
+    ArrayWithComplexGroups: [
+      {
+        label00: {
+          label: '0933751751',
+          phoneNumber: '0962636524',
+        },
+        phoneNumber00: {
+          label: '0933751751',
+          phoneNumber: '0962636524',
+        },
+      },
+    ],
+    ArrayWithControls: [1, 2, 3, 4],
+    ArrayWithFormArrays: [['0933751751', '0933751751']],
+    ArrayWithGroups: [
+      {
+        label: '09337517511111',
+        phoneNumber: '09626365241111111',
+      },
+      {
+        label: '09337517512222222',
+        phoneNumber: '096263652422222222',
+      },
+    ],
+    socialProfiles: {
+      instagram: 1,
+      twitter: 2,
+      youtube: 3,
+    },
+    terms: true,
   };
 }
