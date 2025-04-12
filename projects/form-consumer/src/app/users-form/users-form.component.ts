@@ -108,41 +108,50 @@ export class UsersFormComponent {
       },
     },
   };
-  data = {
-    Gender: 'female',
-    email: 'aliabodraa@yahoo.com',
-    fullName: 'ali101',
-    reviewRating: 'good',
-    role: 'editor',
-    ArrayWithComplexGroups: [
-      {
-        label00: {
-          label: '0933751751',
-          phoneNumber: '0962636524',
+  data = {};
+  ngAfterViewInit(): void {}
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    setTimeout(() => {
+      console.log('-----');
+      this.data = {
+        Gender: 'female',
+        email: 'aliabodraa@yahoo.com',
+        fullName: 'ali101',
+        reviewRating: 'good',
+        role: 'editor',
+        ArrayWithComplexGroups: [
+          {
+            label00: {
+              label: '0933751751',
+              phoneNumber: '0962636524',
+            },
+            phoneNumber00: {
+              label: '0933751751',
+              phoneNumber: '0962636524',
+            },
+          },
+        ],
+        ArrayWithControls: [1, 2, 3, 4],
+        ArrayWithFormArrays: [['0933751751', '0933751751']],
+        ArrayWithGroups: [
+          {
+            label: '09337517511111',
+            phoneNumber: '09626365241111111',
+          },
+          {
+            label: '09337517512222222',
+            phoneNumber: '096263652422222222',
+          },
+        ],
+        socialProfiles: {
+          instagram: 1,
+          twitter: 2,
+          youtube: 3,
         },
-        phoneNumber00: {
-          label: '0933751751',
-          phoneNumber: '0962636524',
-        },
-      },
-    ],
-    ArrayWithControls: [1, 2, 3, 4],
-    ArrayWithFormArrays: [['0933751751', '0933751751']],
-    ArrayWithGroups: [
-      {
-        label: '09337517511111',
-        phoneNumber: '09626365241111111',
-      },
-      {
-        label: '09337517512222222',
-        phoneNumber: '096263652422222222',
-      },
-    ],
-    socialProfiles: {
-      instagram: 1,
-      twitter: 2,
-      youtube: 3,
-    },
-    terms: true,
-  };
+        terms: true,
+      };
+    }, 2000);
+  }
 }

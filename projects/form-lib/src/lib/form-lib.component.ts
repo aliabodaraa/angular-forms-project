@@ -11,6 +11,7 @@ import { LIB_CONFIG } from './lib-config';
 import {
   ControlContainer,
   FormGroup,
+  FormGroupDirective,
   ReactiveFormsModule,
 } from '@angular/forms';
 import { DynamicControlResolver } from './dynamic-forms/dynamic-control-resolver.service';
@@ -23,7 +24,7 @@ import { CustomValidatorsType } from './dynamic-forms';
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div
-      *ngIf="form && config$ | async as formConfig"
+      *ngIf="formGroup && config$ | async as formConfig"
       class="dynamic-form-container"
     >
       <h3 class="form-heading">{{ formConfig.description }}</h3>
@@ -39,7 +40,6 @@ import { CustomValidatorsType } from './dynamic-forms';
             controlKey: control.key,
             config: control.value,
             customValidators: customValidators,
-            values
           }"
         ></ng-container>
       </ng-container>
@@ -48,7 +48,7 @@ import { CustomValidatorsType } from './dynamic-forms';
         <ng-content></ng-content>
       </div>
 
-      <button [disabled]="form?.invalid">Save</button>
+      <button [disabled]="formGroup?.invalid">Save</button>
     </div>
   `,
   styles: `
@@ -68,12 +68,12 @@ export class FormLibComponent implements OnInit {
   protected controlResolver = inject(DynamicControlResolver);
   protected comparatorFn = comparatorFn;
   public config$ = inject(LIB_CONFIG);
-  public form = inject(ControlContainer, {
+  public formGroup = inject(ControlContainer, {
     optional: true,
-  })?.formDirective as FormGroup | null | undefined;
+  }) as FormGroupDirective | null;
 
   ngOnInit(): void {
-    this.form?.statusChanges
+    this.formGroup?.statusChanges
       ?.pipe(
         bufferCount(2, 1),
         filter(
@@ -88,8 +88,9 @@ export class FormLibComponent implements OnInit {
       });
   }
   @Input() customValidators: CustomValidatorsType;
-  @Input() values: any;
-  get updateMode() {
-    return !!this.values;
+  @Input() set values(values: any) {
+    setTimeout(() => {
+      this.formGroup?.resetForm(values);
+    }, 300);
   }
 }

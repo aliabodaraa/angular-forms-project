@@ -49,7 +49,6 @@ export class BaseDynamicControl implements OnInit {
   @Input() controlKey: string;
   @Input() config: DynamicControl;
   @Input() customValidators: CustomValidatorsType = {};
-  @Input() values: any;
 
   @HostBinding('class') hostClass = 'form-field';
 
@@ -60,13 +59,11 @@ export class BaseDynamicControl implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     const config: DynamicControl = changes['config']?.currentValue;
     const controlKey = changes['controlKey']?.currentValue as string;
-    const values = changes['values']?.currentValue || {};
     if (config && controlKey) {
-      if (Object.keys(values).length)
-        this.formControl.patchValue(values[controlKey]);
-      else if (this.hasValue(config)) this.formControl.patchValue(config.value);
+      if (this.hasValue(config)) this.formControl.patchValue(config.value);
       const customValidators = changes['customValidators']
         ?.currentValue as CustomValidatorsType;
+
       if (customValidators && controlKey) {
         const { sync, async } = customValidators?.[controlKey] ?? {};
 
