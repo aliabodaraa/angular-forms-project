@@ -1,8 +1,9 @@
 <p>users-form works!</p>
 <!-- <button (click)="addToArray()">addToArray</button> -->
 
-<form [formGroup]="form" (ngSubmit)="onSubmit(form)">
-  <lib-form [customValidators]="fiedsValidators" [values]="data">
-    <cfc-rating-picker formControlName="reviewRating"></cfc-rating-picker>
-  </lib-form>
-</form>
+<lib-form
+  [customValidators]="fieldsValidators"
+  [formValue]="data"
+  (submissionEmitter)="onSubmit($event)"
+>
+</lib-form>

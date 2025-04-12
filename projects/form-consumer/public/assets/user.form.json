@@ -28,6 +28,10 @@
       "order": 2,
       "options": [
         {
+          "label": "---no-value---",
+          "value": ""
+        },
+        {
           "label": "Admin",
           "value": "admin"
         },

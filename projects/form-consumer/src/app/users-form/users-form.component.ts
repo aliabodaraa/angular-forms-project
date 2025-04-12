@@ -29,12 +29,7 @@ import {
 
 @Component({
   selector: 'app-users-form',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormLibComponent,
-    RatingPickerComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, FormLibComponent],
   standalone: true,
   templateUrl: './users-form.component.html',
   styleUrl: './users-form.component.scss',
@@ -45,15 +40,15 @@ export class UsersFormComponent {
   public form = new FormGroup({
     reviewRating: new FormControl('', [Validators.required]),
   });
-  protected onSubmit(form: FormGroup) {
-    console.log('Submitted data: ', form.value);
+  protected onSubmit(formValue: Record<string, any>) {
+    console.log('Submitted data: ', formValue);
     // form.reset();
   }
   cd = inject(ChangeDetectorRef);
   addToArray() {
     console.log('aaaaaaaaaaaaaaaaa');
     this.banWordsArray.push('ali1');
-    this.fiedsValidators = JSON.parse(JSON.stringify(this.fiedsValidators));
+    this.fieldsValidators = JSON.parse(JSON.stringify(this.fieldsValidators));
   }
   banWordsArray = ['ali'];
   bannedWordsFn(bannedWords: string[] = []) {
@@ -92,7 +87,7 @@ export class UsersFormComponent {
       );
     };
   }
-  fiedsValidators: CustomValidatorsType = {
+  fieldsValidators: CustomValidatorsType = {
     fullName: {
       sync: {
         fn: this.bannedWordsFn(this.banWordsArray),
@@ -116,33 +111,33 @@ export class UsersFormComponent {
     setTimeout(() => {
       console.log('-----');
       this.data = {
-        Gender: 'female',
-        email: 'aliabodraa@yahoo.com',
-        fullName: 'ali101',
-        reviewRating: 'good',
-        role: 'editor',
+        Gender: 'male',
+        email: 'aliabodraa@yahoo.com (custom)',
+        fullName: 'ali101 (custom)',
+        reviewRating: 'good (custom)',
+        role: 'admin',
         ArrayWithComplexGroups: [
           {
             label00: {
-              label: '0933751751',
-              phoneNumber: '0962636524',
+              label: '0933751751 (custom)',
+              phoneNumber: '000000000000',
             },
             phoneNumber00: {
-              label: '0933751751',
-              phoneNumber: '0962636524',
+              label: '0933751751 (custom)',
+              phoneNumber: '000000000000',
             },
           },
         ],
         ArrayWithControls: [1, 2, 3, 4],
-        ArrayWithFormArrays: [['0933751751', '0933751751']],
+        ArrayWithFormArrays: [['0933751751 (custom)', '0933751751 (custom)']],
         ArrayWithGroups: [
           {
-            label: '09337517511111',
-            phoneNumber: '09626365241111111',
+            label: '093375175 (custom)',
+            phoneNumber: '000000000000',
           },
           {
-            label: '09337517512222222',
-            phoneNumber: '096263652422222222',
+            label: '0933751751 (custom)',
+            phoneNumber: '000000000000',
           },
         ],
         socialProfiles: {
