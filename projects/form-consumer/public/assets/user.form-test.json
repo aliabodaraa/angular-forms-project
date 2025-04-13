@@ -49,29 +49,12 @@
       "controlType": "group",
       "label": "Links to Social Profiles",
       "order": 3,
-      "controls": {
-        "youtube": {
-          "controlType": "input",
-          "label": "YouTube",
-          "value": 1,
-          "type": "text",
-          "order": 0
-        },
-        "twitter": {
-          "controlType": "input",
-          "label": "Twitter",
-          "value": 2,
-          "type": "text",
-          "order": 1
-        },
-        "instagram": {
-          "controlType": "input",
-          "label": "Instagram",
-          "value": 3,
-          "type": "text",
-          "order": 2
-        }
-      }
+      "childSkeleton": {
+        "controlType": "input",
+        "label": "YouTube",
+        "type": "text"
+      },
+      "controls": {}
     },
     "terms": {
       "controlType": "checkbox",
@@ -89,39 +72,10 @@
       "childSkeleton": {
         "controlType": "input",
         "type": "number",
-        "defaultValue": 11,
+        "defaultValue": 111,
         "defaultLabel": "label"
       },
-      "controls": [
-        {
-          "controlType": "input",
-          "label": "label 1",
-          "value": 1,
-          "type": "number",
-          "order": 0
-        },
-        {
-          "controlType": "input",
-          "label": "label 2",
-          "value": 2,
-          "type": "number",
-          "order": 1
-        },
-        {
-          "controlType": "input",
-          "label": "label 3",
-          "value": 3,
-          "type": "number",
-          "order": 2
-        },
-        {
-          "controlType": "input",
-          "label": "label 4",
-          "value": 4,
-          "type": "number",
-          "order": 3
-        }
-      ]
+      "controls": []
     },
     "ArrayWithGroups": {
       "controlType": "array",
@@ -145,50 +99,7 @@
           }
         }
       },
-      "controls": [
-        {
-          "controlType": "group",
-          "label": "Phone Group 1",
-          "order": 0,
-          "controls": {
-            "label": {
-              "controlType": "input",
-              "label": "phone label 1",
-              "value": "0933751751",
-              "type": "text",
-              "order": 0
-            },
-            "phoneNumber": {
-              "controlType": "input",
-              "label": "phone 1",
-              "value": "0962636524",
-              "type": "number",
-              "order": 1
-            }
-          }
-        },
-        {
-          "controlType": "group",
-          "label": "Phone Group 2",
-          "order": 1,
-          "controls": {
-            "label": {
-              "controlType": "input",
-              "label": "phone label 1",
-              "value": "0933751751",
-              "type": "text",
-              "order": 0
-            },
-            "phoneNumber": {
-              "controlType": "input",
-              "label": "phone 1",
-              "value": "0962636524",
-              "type": "number",
-              "order": 1
-            }
-          }
-        }
-      ]
+      "controls": []
     },
     "ArrayWithComplexGroups": {
       "controlType": "array",
@@ -236,55 +147,7 @@
           }
         }
       },
-      "controls": [
-        {
-          "controlType": "group",
-          "label": "Phone Group 1",
-          "order": 0,
-          "controls": {
-            "label00": {
-              "controlType": "group",
-              "label": "Nested Phone Group 1",
-              "controls": {
-                "label": {
-                  "controlType": "input",
-                  "label": "phone label 1",
-                  "value": "0933751751",
-                  "type": "text",
-                  "order": 0
-                },
-                "phoneNumber": {
-                  "controlType": "input",
-                  "label": "phone 1",
-                  "value": "0962636524",
-                  "type": "number",
-                  "order": 1
-                }
-              }
-            },
-            "phoneNumber00": {
-              "controlType": "group",
-              "label": "Nested Phone Group 2",
-              "controls": {
-                "label": {
-                  "controlType": "input",
-                  "label": "phone label 1",
-                  "value": "0933751751",
-                  "type": "text",
-                  "order": 0
-                },
-                "phoneNumber": {
-                  "controlType": "input",
-                  "label": "phone 1",
-                  "value": "0962636524",
-                  "type": "number",
-                  "order": 1
-                }
-              }
-            }
-          }
-        }
-      ]
+      "controls": []
     },
     "ArrayWithFormArrays": {
       "controlType": "array",
@@ -313,36 +176,7 @@
           }
         ]
       },
-      "controls": [
-        {
-          "controlType": "array",
-          "label": "Array Of Array 1",
-          "isRemovable": true,
-          "isAddable": true,
-          "childSkeleton": {
-            "controlType": "input",
-            "type": "number",
-            "defaultValue": 11,
-            "note": "we can overide the parent childSkeleton or still overide it here"
-          },
-          "controls": [
-            {
-              "controlType": "input",
-              "label": "phone label 1",
-              "value": "0933751751",
-              "type": "text",
-              "order": 0
-            },
-            {
-              "controlType": "input",
-              "label": "phone label 2",
-              "value": "0933751751",
-              "type": "text",
-              "order": 1
-            }
-          ]
-        }
-      ]
+      "controls": []
     },
     "Gender": {
       "controlType": "radio",

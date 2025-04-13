@@ -1,11 +1,4 @@
-import {
-  AbstractControl,
-  AsyncValidatorFn,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { AsyncValidatorFn, ValidatorFn, Validators } from '@angular/forms';
 
 export type ValidatorKeys = keyof Omit<
   typeof Validators & { banWords: ValidatorFn },
@@ -66,7 +59,7 @@ export interface ARRAY extends FIELD {
   controlType: 'array';
   isRemovable: boolean;
   isAddable: boolean;
-  childArrayStructure: ChildArrayStructure;
+  childSkeleton: childSkeleton;
   controls: DynamicControl[];
 }
 export type DynamicControl =
@@ -82,7 +75,7 @@ export interface DynamicFormConfig {
   controls: Record<string, DynamicControl>;
 }
 
-//---------The Following Types Made To Achieve StrictTypeing On The Property ChildArrayStructure Get From FormArray Json Config--------
+//---------The Following Types Made To Achieve StrictTypeing On The Property childSkeleton Get From FormArray Json Config--------
 
 type InputTypes =
   | 'text'
@@ -106,25 +99,25 @@ type InputTypes =
 
 export interface InputField {
   controlType: 'input';
-  defaultCreationValue: string | number;
+  defaultValue: string | number;
   type: InputTypes;
 }
 
 export interface GroupField {
   controlType: 'group';
-  defaultCreationLabel: string;
+  defaultLabel: string;
   controls: Record<string, InputField> | Record<string, GroupField>;
 }
 
 interface ArrayField {
   controlType: 'array';
-  defaultCreationLabel: string;
+  defaultLabel: string;
   isRemovable: boolean;
   isAddable: boolean;
   controls: InputField[] | GroupField[];
 }
 
-export type ChildArrayStructure = InputField | GroupField | ArrayField;
+export type childSkeleton = InputField | GroupField | ArrayField;
 type SyncValidator<T> = {
   fnName: string;
   fnReturnedType: T;

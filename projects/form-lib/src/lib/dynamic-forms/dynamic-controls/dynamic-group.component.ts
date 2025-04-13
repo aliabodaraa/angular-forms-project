@@ -50,4 +50,8 @@ export class DynamicGroupComponent extends BaseDynamicControl {
   get configGroup(): GROUP | null {
     return this.config as GROUP;
   }
+  override ngOnInit(): void {
+    super.ngOnInit();
+    console.log(this.isInUpdatedMode, this.fieldValue, 'isInUpdatedMode');
+  }
 }

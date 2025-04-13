@@ -12,6 +12,7 @@ import { INPUT } from '../dynamic-forms.model';
   imports: [...sharedDynamicControlDeps],
   viewProviders: [dynamicControlProvider],
   template: `
+    {{ config.order }}
     <label [for]="controlKey">{{ configInput?.label }}</label>
     <input
       [formControlName]="controlKey"

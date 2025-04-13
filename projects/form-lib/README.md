@@ -200,7 +200,7 @@ A Form Array is useful when you need to create dynamic sets of similar form cont
 
 ### **Case 5.1: Form Array With Controls**
 
-An array of input fields for multiple phone numbers. The childArrayStructure defines the structure of each control that will be added to the array.
+An array of input fields for multiple phone numbers. The childSkeleton defines the structure of each control that will be added to the array.
 
 ```json
 {
@@ -208,7 +208,7 @@ An array of input fields for multiple phone numbers. The childArrayStructure def
     "controlType": "array",
     "label": "Phone Numbers",
     "order": 5,
-    "childArrayStructure": {
+    "childSkeleton": {
       "controlType": "input",
       "type": "number"
     },
@@ -220,11 +220,11 @@ An array of input fields for multiple phone numbers. The childArrayStructure def
 }
 ```
 
-In this case, the childArrayStructure object specifies that each form control added to the array will be an input field of type number, with a default value of 22. The component responsible for creating the FormArray uses this configuration to dynamically generate the correct form controls.
+In this case, the childSkeleton object specifies that each form control added to the array will be an input field of type number, with a default value of 22. The component responsible for creating the FormArray uses this configuration to dynamically generate the correct form controls.
 
-**What does childArrayStructure do ?**
-The childArrayStructure property tells the component how to create each form control within the array. It defines the type, validation, and any other necessary properties of the control or group that will be dynamically added. The array's controls are then populated based on this structure.
-By using childArrayStructure, you have complete flexibility in specifying the shape of the form controls or groups within a FormArray, enabling dynamic form generation based on the configuration.
+**What does childSkeleton do ?**
+The childSkeleton property tells the component how to create each form control within the array. It defines the type, validation, and any other necessary properties of the control or group that will be dynamically added. The array's controls are then populated based on this structure.
+By using childSkeleton, you have complete flexibility in specifying the shape of the form controls or groups within a FormArray, enabling dynamic form generation based on the configuration.
 
 ---
 
@@ -234,7 +234,7 @@ By using childArrayStructure, you have complete flexibility in specifying the sh
 
 ### **Case 6: Form Array With Groups**
 
-If you need to create complex nested structures within the Form Array, you can define a group within the childArrayStructure.
+If you need to create complex nested structures within the Form Array, you can define a group within the childSkeleton.
 
 ```json
 {
@@ -242,7 +242,7 @@ If you need to create complex nested structures within the Form Array, you can d
     "controlType": "array",
     "label": "Phone Groups",
     "order": 6,
-    "childArrayStructure": {
+    "childSkeleton": {
       "controlType": "group",
       "controls": {
         "label": { "controlType": "input", "type": "text" },
@@ -253,7 +253,7 @@ If you need to create complex nested structures within the Form Array, you can d
 }
 ```
 
-In this example, the childArrayStructure defines a group, and each element of the array will contain both a label and a phoneNumber input field.
+In this example, the childSkeleton defines a group, and each element of the array will contain both a label and a phoneNumber input field.
 
 ✅ **Use case:** Structured nested forms.
 
@@ -268,25 +268,25 @@ A complex nested structure with groups inside an array.
     "controlType": "array",
     "label": "Links to your complex Phones section numbers",
     "order": 7,
-    "childArrayStructure": {
-      "defaultCreationLabel": "Nested Array Of Complex Groups",
+    "childSkeleton": {
+      "defaultLabel": "Nested Array Of Complex Groups",
       "controlType": "group",
       "controls": {
         "phoneNumber": {
-          "defaultCreationLabel": "Nested phoneNumber",
+          "defaultLabel": "Nested phoneNumber",
           "controlType": "group",
           "controls": {
             "label": {
               "controlType": "input",
               "type": "number",
-              "defaultCreationValue": 1,
-              "defaultCreationLabel": "phone label"
+              "defaultValue": 1,
+              "defaultLabel": "phone label"
             },
             "phoneNumber": {
               "controlType": "input",
               "type": "number",
-              "defaultCreationValue": 2,
-              "defaultCreationLabel": "phone label"
+              "defaultValue": 2,
+              "defaultLabel": "phone label"
             }
           }
         }
@@ -337,26 +337,26 @@ A complex nested structure with groups inside an array.
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 8,
-      "childArrayStructure": {
-        "defaultCreationLabel": "Array Of Array",
+      "childSkeleton": {
+        "defaultLabel": "Array Of Array",
         "controlType": "array",
         "isRemovable": true,
         "isAddable": true,
-        "childArrayStructure": {
+        "childSkeleton": {
           "controlType": "input",
           "type": "number",
-          "defaultCreationValue": 22
+          "defaultValue": 22
         },
         "controls": [
           {
             "controlType": "input",
             "type": "number",
-            "defaultCreationValue": "0944661224"
+            "defaultValue": "0944661224"
           },
           {
             "controlType": "input",
             "type": "number",
-            "defaultCreationValue": "0944661224"
+            "defaultValue": "0944661224"
           }
         ]
       },

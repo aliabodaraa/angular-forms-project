@@ -4,9 +4,9 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
+  Inject,
   inject,
   Input,
-  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -18,7 +18,9 @@ import {
 } from '@angular/forms';
 import { DynamicControlResolver } from './dynamic-forms/dynamic-control-resolver.service';
 import { comparatorFn } from './dynamic-forms/dynamic-controls/base-dynamic-control';
-import { CustomValidatorsType } from './dynamic-forms';
+import { CustomValidatorsType, DynamicFormConfig } from './dynamic-forms';
+import { Observable, take } from 'rxjs';
+import { buildDesiredObjectStructure } from './urils/jsonData';
 
 @Component({
   selector: 'lib-form',
@@ -28,7 +30,7 @@ import { CustomValidatorsType } from './dynamic-forms';
       [formGroup]="form"
       (reset)="onReset($event)"
       (ngSubmit)="onSubmit($event)"
-      *ngIf="config$ | async as formConfig"
+      *ngIf="formConfig"
     >
       <div class="dynamic-form-container">
         <h3 class="form-heading">{{ formConfig.description }}</h3>
@@ -41,16 +43,13 @@ import { CustomValidatorsType } from './dynamic-forms';
             "
             [ngComponentOutlet]="componentType"
             [ngComponentOutletInputs]="{
-            controlKey: control.key,
-            config: control.value,
-            customValidators: customValidators,
-          }"
+              controlKey: control.key,
+              config: control.value,
+              customValidators: customValidators,
+              fieldValue: formValue?.[control.key]
+            }"
           ></ng-container>
         </ng-container>
-
-        <div class="extenal-controls">
-          <ng-content></ng-content>
-        </div>
 
         <button [disabled]="form.invalid || form.pending">Save</button>
         <button
@@ -64,15 +63,6 @@ import { CustomValidatorsType } from './dynamic-forms';
       </div>
     </form>
   `,
-  styles: `
-  .extenal-controls{
-    margin: 12px 0;
-    display: flex
-;
-    flex-direction: column;
-    gap: 12px 0;
-  }
-  `,
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -81,19 +71,70 @@ export class FormLibComponent {
   protected controlResolver = inject(DynamicControlResolver);
   protected comparatorFn = comparatorFn;
   public form = new FormGroup({});
-  public config$ = inject(LIB_CONFIG);
-
+  formConfig: DynamicFormConfig;
+  json$: Observable<DynamicFormConfig>;
   @ViewChild(FormGroupDirective)
   private formDir!: FormGroupDirective;
   @Input() customValidators: CustomValidatorsType;
+  _formValue: any;
+  cd = inject(ChangeDetectorRef);
   @Input() set formValue(values: any) {
-    setTimeout(() => {
-      this.initialFormValues = this.buildInitialFormValue(values);
-      this.form.reset(values);
-    }, 300);
+    if (Object.keys(values).length) {
+      this._formValue = values;
+      console.log('AAAAAAAAA', values);
+      this.json$.pipe(take(1)).subscribe((formConfig) => {
+        this.formConfig = this.justifyConfigJson(formConfig, values);
+        this.cd.markForCheck();
+      });
+      setTimeout(() => {
+        this.initialFormValues = this.buildInitialFormValue(values);
+        this.form.reset(values);
+      }, 300);
+    }
   }
+  get formValue() {
+    return this._formValue;
+  }
+  constructor(@Inject(LIB_CONFIG) jsonObs: Observable<DynamicFormConfig>) {
+    this.json$ = jsonObs;
+  }
+
   @Input() withReseting: boolean = true;
   @Output() submissionEmitter = new EventEmitter<Record<string, any>>();
+  justifyConfigJson(formConfig: DynamicFormConfig, formValue: any) {
+    for (const key in formConfig.controls) {
+      const element = formConfig.controls[key];
+      if (element.controlType === 'group') {
+        let index = 0;
+        for (const fieldKey in formValue[key]) {
+          element.controls = {
+            ...element.controls,
+            [fieldKey]: buildDesiredObjectStructure(
+              (element as any)['childSkeleton'],
+              index,
+              formValue[key][fieldKey],
+              fieldKey
+            ),
+          };
+          index++;
+        }
+      } else if (element.controlType === 'array') {
+        let index = 0;
+        for (const fieldKey in formValue[key]) {
+          element.controls.push(
+            buildDesiredObjectStructure(
+              (element as any)['childSkeleton'],
+              index,
+              formValue[key][fieldKey]
+            ) as any
+          );
+          index++;
+        }
+      }
+    }
+    console.log(formConfig, '-----');
+    return formConfig;
+  }
 
   private buildInitialFormValue(formData: Record<string, any>) {
     let initialValue = {};

@@ -15,11 +15,8 @@ import {
 } from './base-dynamic-control';
 import { FormArray } from '@angular/forms';
 import { DynamicControlResolver } from '../dynamic-control-resolver.service';
-import {
-  ARRAY,
-  ChildArrayStructure,
-  DynamicControl,
-} from '../dynamic-forms.model';
+import { ARRAY, childSkeleton, DynamicControl } from '../dynamic-forms.model';
+import { buildDesiredObjectStructure } from '../../urils/jsonData';
 
 @Component({
   selector: 'app-dynamic-array',
@@ -79,6 +76,7 @@ export class DynamicArrayComponent extends BaseDynamicControl {
   constructor(@Optional() @SkipSelf() public parent: DynamicArrayComponent) {
     super();
   }
+  addCtrl111() {}
   get isInsideDynamicArray() {
     return !!this.parent;
   }
@@ -90,6 +88,7 @@ export class DynamicArrayComponent extends BaseDynamicControl {
     this._lastOrder = newOrder;
   }
   controlResolver = inject(DynamicControlResolver);
+
   override formControl = new FormArray<any>([]);
   protected comparatorFn = comparatorFn;
   arrayControls: ARRAY['controls'] = [];
@@ -114,79 +113,27 @@ export class DynamicArrayComponent extends BaseDynamicControl {
   }
 
   addCtrl() {
-    let childStructure = this.configArray.childArrayStructure;
-    if (!childStructure) {
+    let childSkeleton = this.configArray.childSkeleton;
+    if (!childSkeleton) {
       //issue: this condition is respecting the edge case when we have 2 nested formArray to make the (addition-action) work correctly for the newly added controls
       //need refactoring: when we are gonna have more than two nested formArray /we can still Ascend to the parent until we reach to the root FormArray instead of the direct parent only/
-      childStructure = (
-        (this.parent.config as ARRAY).childArrayStructure as Partial<{
-          childArrayStructure: ChildArrayStructure;
+      childSkeleton = (
+        (this.parent.config as ARRAY).childSkeleton as Partial<{
+          childSkeleton: childSkeleton;
         }>
-      ).childArrayStructure!;
-      if (!childStructure)
+      ).childSkeleton!;
+      if (!childSkeleton)
         throw new Error(
-          '//You should provide childArrayStructure jsonObject in the corresponding json file//'
+          '//You should provide childSkeleton jsonObject in the corresponding json file//'
         );
     }
 
-    const newCtrl = this.buildDesiredObjectStructure(
-      childStructure
+    const newCtrl = buildDesiredObjectStructure(
+      childSkeleton,
+      this.lastOrder
     ) as DynamicControl;
     this.lastOrder++;
     this.arrayControls.push(newCtrl);
-  }
-
-  private buildDesiredObjectStructure(
-    childStructure: ChildArrayStructure,
-    lastOrder: number = this.lastOrder
-  ) {
-    let newCtrl = {};
-    if (childStructure.controlType === 'input') {
-      newCtrl = {
-        controlType: childStructure.controlType,
-        label: `${childStructure.controlType} ${lastOrder + 1}`,
-        value: childStructure.defaultCreationValue,
-        type: childStructure.type,
-        order: this.lastOrder,
-      };
-    } else if (childStructure.controlType === 'group') {
-      let group = childStructure.controls;
-      let ctrls = {};
-      Object.values(group).forEach((ctrl, index) => {
-        const ctrlName = Object.keys(group)[index];
-        ctrls = {
-          ...ctrls,
-          [ctrlName]: this.buildDesiredObjectStructure(
-            ctrl,
-            index
-          ) as DynamicControl,
-        };
-      });
-      newCtrl = {
-        controlType: childStructure.controlType,
-        label: `${childStructure.defaultCreationLabel || ''} ${lastOrder + 1}`,
-        order: lastOrder,
-        controls: ctrls,
-      };
-    } else if (childStructure.controlType === 'array') {
-      let array = childStructure.controls;
-      let ctrls: ARRAY['controls'] = [];
-      array.forEach((ctrl, index) => {
-        ctrls.push(
-          this.buildDesiredObjectStructure(ctrl, index) as DynamicControl
-        );
-      });
-      newCtrl = {
-        controlType: childStructure.controlType,
-        label: `${childStructure.defaultCreationLabel || ''} ${lastOrder + 1}`,
-        order: lastOrder,
-        controls: ctrls,
-        isAddable: childStructure.isAddable,
-        isRemovable: childStructure.isRemovable,
-      };
-    }
-
-    return newCtrl;
   }
 
   removeCtrl(index: number) {

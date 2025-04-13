@@ -23,10 +23,9 @@ import {
   CustomValidatorsType,
   DynamicControl,
   HAS_VALUE,
-  ValidatorKeys,
 } from '../dynamic-forms.model';
 import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 
 export const comparatorFn = (
   a: KeyValue<string, DynamicControl>,
@@ -49,9 +48,12 @@ export class BaseDynamicControl implements OnInit {
   @Input() controlKey: string;
   @Input() config: DynamicControl;
   @Input() customValidators: CustomValidatorsType = {};
+  @Input() fieldValue: any;
 
   @HostBinding('class') hostClass = 'form-field';
-
+  get isInUpdatedMode() {
+    return !!Object.keys(this.fieldValue || {}).length;
+  }
   cd = inject(ChangeDetectorRef);
 
   formControl: AbstractControl = new FormControl();
@@ -60,7 +62,8 @@ export class BaseDynamicControl implements OnInit {
     const config: DynamicControl = changes['config']?.currentValue;
     const controlKey = changes['controlKey']?.currentValue as string;
     if (config && controlKey) {
-      if (this.hasValue(config)) this.formControl.patchValue(config.value);
+      if (this.fieldValue) this.formControl.patchValue(this.fieldValue);
+      else if (this.hasValue(config)) this.formControl.patchValue(config.value);
       const customValidators = changes['customValidators']
         ?.currentValue as CustomValidatorsType;
 

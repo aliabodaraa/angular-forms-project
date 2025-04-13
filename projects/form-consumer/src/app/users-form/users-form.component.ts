@@ -33,7 +33,7 @@ import {
   standalone: true,
   templateUrl: './users-form.component.html',
   styleUrl: './users-form.component.scss',
-  providers: [jsonFileProvider('assets/user.form.json')],
+  providers: [jsonFileProvider('assets/user.form-test.json')],
 })
 export class UsersFormComponent {
   constructor(private http: HttpClient) {}
@@ -128,15 +128,15 @@ export class UsersFormComponent {
             },
           },
         ],
-        ArrayWithControls: [1, 2, 3, 4],
-        ArrayWithFormArrays: [['0933751751 (custom)', '0933751751 (custom)']],
+        ArrayWithControls: [100, 200],
+        ArrayWithFormArrays: [['0933751751', '0933751751']],
         ArrayWithGroups: [
           {
-            label: '093375175 (custom)',
+            label: '093375175',
             phoneNumber: '000000000000',
           },
           {
-            label: '0933751751 (custom)',
+            label: '0933751751',
             phoneNumber: '000000000000',
           },
         ],
