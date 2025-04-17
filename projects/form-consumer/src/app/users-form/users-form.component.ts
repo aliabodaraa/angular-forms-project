@@ -87,29 +87,24 @@ export class UsersFormComponent {
       );
     };
   }
-  fieldsValidators: CustomValidatorsType = {
-    fullName: {
-      sync: {
-        fn: this.bannedWordsFn(this.banWordsArray),
-        fnName: 'banWords',
-        fnReturnedType: 'VE',
-        validatorParam: ['Test', 'Dummy'],
-      },
-      async: {
-        fnName: 'uniqueName',
-        fnReturnedType: 'VF',
-        fn: this.uniqueNameFn.bind(this),
-        validatorParam: ['ali100', 'ali101'],
-      },
-    },
-  };
+  passwordMatchingValidator(control: AbstractControl): ValidationErrors | null {
+    const { password, confirmPassword } = control.value;
+
+    if (!confirmPassword || !password) {
+      return null;
+    }
+
+    if (confirmPassword === password) {
+      return null;
+    }
+
+    return { passwordMatching: { message: 'Password Not Matching' } };
+  }
+  fieldsValidators: CustomValidatorsType = {};
   data = {};
   ngAfterViewInit(): void {}
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
     setTimeout(() => {
-      console.log('-----');
       this.data = {
         Gender: 'male',
         email: 'aliabodraa@yahoo.com (custom)',
@@ -120,33 +115,57 @@ export class UsersFormComponent {
           {
             label00: {
               label: '0933751751 (custom)',
-              phoneNumber: '000000000000',
+              phoneNumber: '000001111110000000',
             },
             phoneNumber00: {
               label: '0933751751 (custom)',
-              phoneNumber: '000000000000',
+              phoneNumber: '000002222222000000',
             },
           },
         ],
-        ArrayWithControls: [100, 200],
-        ArrayWithFormArrays: [['0933751751', '0933751751']],
+        ArrayWithControls: [1100, 2200],
+        ArrayWithFormArrays: [['09331111751751', '093372222222222251751']],
         ArrayWithGroups: [
           {
-            label: '093375175',
-            phoneNumber: '000000000000',
+            label: '000000000000',
+            phoneNumber: '0000010000000',
           },
           {
             label: '0933751751',
-            phoneNumber: '000000000000',
+            phoneNumber: '0000030000000',
           },
         ],
         socialProfiles: {
-          instagram: 1,
-          twitter: 2,
-          youtube: 3,
+          instagram: 11,
+          twitter: 22,
+          youtube: 33,
         },
         terms: true,
       };
     }, 2000);
+
+    this.fieldsValidators = {
+      fullName: {
+        sync: {
+          fn: this.bannedWordsFn(this.banWordsArray),
+          fnName: 'banWords',
+          fnReturnedType: 'VE',
+          validatorParam: ['Test', 'Dummy'],
+        },
+        async: {
+          fnName: 'uniqueName',
+          fnReturnedType: 'VF',
+          fn: this.uniqueNameFn.bind(this),
+          validatorParam: ['ali100', 'ali101'],
+        },
+      },
+      passwords: {
+        sync: {
+          fnName: 'passwordMatchingValidator',
+          fnReturnedType: 'VE',
+          fn: this.passwordMatchingValidator,
+        },
+      },
+    };
   }
 }

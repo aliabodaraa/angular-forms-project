@@ -16,12 +16,7 @@ export class ErrorStateMatcher implements ErrorStateMatcher {
     control: AbstractControl | null,
     form: FormGroupDirective | NgForm | null
   ) {
-    return Boolean(
-      control &&
-        ((control.invalid && (control.dirty || (form && form.submitted))) ||
-          (control.dirty && control.pending) ||
-          (control.invalid && control.pristine))
-    );
+    return Boolean(true);
   }
 }
 export class OnTouchedErrorStateMatcher implements ErrorStateMatcher {

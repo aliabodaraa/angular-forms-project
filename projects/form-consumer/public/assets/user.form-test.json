@@ -1,4 +1,6 @@
 {
+  "updateOn": "submit",
+
   "description": "The new user form config",
   "controls": {
     "fullName": {
@@ -73,9 +75,16 @@
         "controlType": "input",
         "type": "number",
         "defaultValue": 111,
-        "defaultLabel": "label"
+        "defaultLabel": "label",
+        "validators": {
+          "required": true,
+          "min": 3
+        }
       },
-      "controls": []
+      "controls": [],
+      "validators": {
+        "minLength": 4
+      }
     },
     "ArrayWithGroups": {
       "controlType": "array",
@@ -89,13 +98,19 @@
             "controlType": "input",
             "type": "number",
             "defaultValue": 1,
-            "defaultLabel": "phone label"
+            "defaultLabel": "phone label",
+            "validators": {
+              "required": true
+            }
           },
           "phoneNumber": {
             "controlType": "input",
             "type": "number",
             "defaultValue": 2,
-            "defaultLabel": "phone label"
+            "defaultLabel": "phone label",
+            "validators": {
+              "required": true
+            }
           }
         }
       },
@@ -153,11 +168,19 @@
       "controlType": "array",
       "label": "Links to your complex Phones section numbers",
       "order": 8,
+      "validators": {
+        "minLength": 2,
+        "required": true
+      },
       "childSkeleton": {
         "defaultLabel": "Array Of Array",
         "controlType": "array",
         "isRemovable": true,
         "isAddable": true,
+        "validators": {
+          "minLength": 2,
+          "required": true
+        },
         "childSkeleton": {
           "controlType": "input",
           "type": "number",
@@ -199,6 +222,31 @@
           "order": 1
         }
       ]
+    },
+    "passwords": {
+      "controlType": "group",
+      "label": "Write Your Password",
+      "order": 10,
+      "childSkeleton": {
+        "controlType": "input",
+        "type": "text"
+      },
+      "controls": {
+        "password": {
+          "controlType": "input",
+          "label": "password",
+          "value": "",
+          "type": "text",
+          "order": 0
+        },
+        "confirmPassword": {
+          "controlType": "input",
+          "label": "Confirm Password",
+          "value": "",
+          "type": "text",
+          "order": 1
+        }
+      }
     }
   }
 }

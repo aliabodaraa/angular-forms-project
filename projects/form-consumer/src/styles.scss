@@ -119,16 +119,17 @@ select {
   width: 100%;
 }
 
-.ng-valid.ng-dirty:not([formGroupName]):not([formArrayName]):not(
-    [ngModelGroup]
-  ):not(form):not(paper-textarea) {
-  border: 2px solid var(--color-success);
-}
-.ng-invalid.ng-dirty:not([ngModelGroup="address"]):not(
-    [formGroupName="group"]
-  ):not([formArrayName]):not(form):not([formGroupName="group"]) {
+// .ng-valid.ng-dirty:not([formGroupName]):not([formArrayName]):not(
+//     [ngModelGroup]
+//   ):not(form):not(paper-textarea) {
+//   border: 2px solid var(--color-success);
+// }
+.ng-invalid:not([ngModelGroup="address"]):not([formGroupName="group"]):not(
+    form
+  ):not([formGroupName="group"]) {
   border: 2px solid var(--color-error);
 }
+
 input.ng-pending {
   border: 2px solid var(--color-info);
 }

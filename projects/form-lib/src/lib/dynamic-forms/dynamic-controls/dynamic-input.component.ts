@@ -24,7 +24,5 @@ import { INPUT } from '../dynamic-forms.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DynamicInputComponent extends BaseDynamicControl {
-  get configInput(): INPUT | null {
-    return this.config as INPUT;
-  }
+  configInput = this.config as INPUT | null;
 }

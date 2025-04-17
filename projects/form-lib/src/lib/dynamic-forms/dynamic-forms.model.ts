@@ -62,17 +62,19 @@ export interface ARRAY extends FIELD {
   childSkeleton: childSkeleton;
   controls: DynamicControl[];
 }
-export type DynamicControl =
+export type DynamicControl = (
   | INPUT
   | CHECKBOX
   | RADIO
   | SELECT
   | GROUP
   | ARRAY
-  | CUSTOM;
+  | CUSTOM
+) & { updateOn: 'blur' | 'submit' | 'change' };
 export interface DynamicFormConfig {
   description: string;
   controls: Record<string, DynamicControl>;
+  updateOn: 'blur' | 'submit' | 'change';
 }
 
 //---------The Following Types Made To Achieve StrictTypeing On The Property childSkeleton Get From FormArray Json Config--------

@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import {
   AbstractControl,
-  AsyncValidatorFn,
   ControlContainer,
   FormArray,
   FormControl,
@@ -19,13 +18,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {
-  CustomValidatorsType,
-  DynamicControl,
-  HAS_VALUE,
-} from '../dynamic-forms.model';
+import { DynamicControl, HAS_VALUE } from '../dynamic-forms.model';
 import { DynamicValidatorMessage } from '../input-error/dynamic-validator-message.directive';
-import { of } from 'rxjs';
 
 export const comparatorFn = (
   a: KeyValue<string, DynamicControl>,
@@ -47,37 +41,26 @@ export const dynamicControlProvider: StaticProvider = {
 export class BaseDynamicControl implements OnInit {
   @Input() controlKey: string;
   @Input() config: DynamicControl;
-  @Input() customValidators: CustomValidatorsType = {};
-  @Input() fieldValue: any;
+  @Input() value: any;
 
   @HostBinding('class') hostClass = 'form-field';
-  get isInUpdatedMode() {
-    return !!Object.keys(this.fieldValue || {}).length;
-  }
+
   cd = inject(ChangeDetectorRef);
 
   formControl: AbstractControl = new FormControl();
 
   ngOnChanges(changes: SimpleChanges): void {
     const config: DynamicControl = changes['config']?.currentValue;
-    const controlKey = changes['controlKey']?.currentValue as string;
-    if (config && controlKey) {
-      if (this.fieldValue) this.formControl.patchValue(this.fieldValue);
-      else if (this.hasValue(config)) this.formControl.patchValue(config.value);
-      const customValidators = changes['customValidators']
-        ?.currentValue as CustomValidatorsType;
 
-      if (customValidators && controlKey) {
-        const { sync, async } = customValidators?.[controlKey] ?? {};
-
+    if (config) {
+      if (this.hasValue(config)) this.formControl.patchValue(config.value);
+      (this.formControl as any)._updateOn =
+        config.updateOn || this.parentGroupDir.control?.updateOn || 'change';
+      if (this.formControl.updateOn !== 'submit')
+        //move form here to enable adding the json validators to the form in case updateOn is submitted
         this.formControl.setValidators(
-          this.resolveSyncValidators(sync, config.validators)
+          this.resolveJonSyncValidators(config?.validators)
         );
-
-        this.formControl.setAsyncValidators(
-          this.resolveAsycValidators(async, config.asyncValidators)
-        );
-      }
     }
   }
 
@@ -97,8 +80,7 @@ export class BaseDynamicControl implements OnInit {
     }
   }
 
-  protected resolveSyncValidators(
-    customSyncValidators: CustomValidatorsType[any]['sync'],
+  protected resolveJonSyncValidators(
     jsonValidators: { [key: string]: unknown } | undefined = {}
   ) {
     let validatorsArray = (
@@ -115,52 +97,23 @@ export class BaseDynamicControl implements OnInit {
         return Validators.requiredTrue;
       }
       if (
-        validatorKey === 'minLength' &&
-        typeof jsonValidatorValue === 'number'
+        typeof jsonValidatorValue === 'number' ||
+        typeof jsonValidatorValue === 'string'
       ) {
-        return Validators.minLength(jsonValidatorValue);
+        if (validatorKey === 'min') {
+          return Validators.min(+jsonValidatorValue);
+        }
+        if (validatorKey === 'max') {
+          return Validators.max(+jsonValidatorValue);
+        }
+        if (validatorKey === 'minLength') {
+          return Validators.minLength(+jsonValidatorValue);
+        }
       }
-
       return Validators.nullValidator;
     });
 
-    if (customSyncValidators && Object.keys(customSyncValidators).length) {
-      let sv = Array.isArray(customSyncValidators)
-        ? customSyncValidators
-        : [customSyncValidators];
-      sv.forEach((customSync) => {
-        validatorsArray.push(
-          customSync.fnReturnedType === 'VF'
-            ? customSync.fn(
-                customSync.validatorParam || jsonValidators[customSync.fnName]
-              )
-            : customSync.fn
-        );
-      });
-    }
-
     return validatorsArray;
-  }
-
-  protected resolveAsycValidators(
-    customAsyncValidators: CustomValidatorsType[any]['async'],
-    jsonAsyncValidators: { [key: string]: unknown } = {}
-  ) {
-    if (customAsyncValidators && Object.keys(customAsyncValidators).length) {
-      let av = Array.isArray(customAsyncValidators)
-        ? customAsyncValidators
-        : [customAsyncValidators];
-
-      return av.map((customAsync) => {
-        return customAsync.fnReturnedType === 'VF'
-          ? customAsync.fn(
-              customAsync.validatorParam ||
-                jsonAsyncValidators[customAsync.fnName]
-            )
-          : (customAsync.fn as AsyncValidatorFn);
-      });
-    }
-    return (_: AbstractControl) => of(null);
   }
 
   hasValue(ctrl: any): ctrl is HAS_VALUE<any> {
