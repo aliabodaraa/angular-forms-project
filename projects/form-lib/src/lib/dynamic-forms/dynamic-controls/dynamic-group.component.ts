@@ -4,20 +4,20 @@ import {
   HostBinding,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import {
   BaseDynamicControl,
   comparatorFn,
   dynamicControlProvider,
+  sharedDynamicControlDeps,
 } from './base-dynamic-control';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { DynamicControlResolver } from '../dynamic-control-resolver.service';
 import { GROUP } from '../dynamic-forms.model';
 
 @Component({
   selector: 'app-dynamic-group',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [...sharedDynamicControlDeps],
   viewProviders: [dynamicControlProvider],
   template: `
     <fieldset [formGroupName]="controlKey">
@@ -49,9 +49,5 @@ export class DynamicGroupComponent extends BaseDynamicControl {
   protected comparatorFn = comparatorFn;
   get configGroup(): GROUP | null {
     return this.config as GROUP;
-  }
-  override ngOnInit(): void {
-    super.ngOnInit();
-    console.log(this.isInUpdatedMode, this.fieldValue, 'isInUpdatedMode');
   }
 }

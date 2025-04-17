@@ -1,4 +1,9 @@
-import { ARRAY, childSkeleton, DynamicControl } from '../dynamic-forms';
+import {
+  ARRAY,
+  childSkeleton,
+  DynamicControl,
+  DynamicFormConfig,
+} from '../dynamic-forms';
 
 export function buildDesiredObjectStructure(
   childSkeleton: childSkeleton,
@@ -22,7 +27,12 @@ export function buildDesiredObjectStructure(
       const ctrlName = Object.keys(group)[index];
       ctrls = {
         ...ctrls,
-        [ctrlName]: buildDesiredObjectStructure(ctrl, index) as DynamicControl,
+        [ctrlName]: buildDesiredObjectStructure(
+          ctrl,
+          index,
+          value?.[ctrlName],
+          label
+        ) as DynamicControl,
       };
     });
     newCtrl = {
@@ -35,7 +45,14 @@ export function buildDesiredObjectStructure(
     let array = childSkeleton.controls;
     let ctrls: ARRAY['controls'] = [];
     array.forEach((ctrl, index) => {
-      ctrls.push(buildDesiredObjectStructure(ctrl, index) as DynamicControl);
+      ctrls.push(
+        buildDesiredObjectStructure(
+          ctrl,
+          index,
+          value?.[index],
+          label
+        ) as DynamicControl
+      );
     });
     newCtrl = {
       controlType: childSkeleton.controlType,
@@ -48,4 +65,41 @@ export function buildDesiredObjectStructure(
   }
 
   return newCtrl;
+}
+
+export function adaptJsonConfigWithEnteredValues(
+  formConfig: DynamicFormConfig,
+  values: any
+) {
+  for (const key in formConfig.controls) {
+    const element = formConfig.controls[key];
+    if (element.controlType === 'group') {
+      let index = 0;
+      for (const fieldKey in values[key]) {
+        element.controls = {
+          ...element.controls,
+          [fieldKey]: buildDesiredObjectStructure(
+            (element as any)['childSkeleton'],
+            index,
+            values[key][fieldKey],
+            fieldKey
+          ),
+        };
+        index++;
+      }
+    } else if (element.controlType === 'array') {
+      let index = 0;
+      for (const fieldKey in values[key]) {
+        element.controls.push(
+          buildDesiredObjectStructure(
+            (element as any)['childSkeleton'],
+            index,
+            values[key][fieldKey]
+          ) as any
+        );
+        index++;
+      }
+    }
+  }
+  return formConfig;
 }

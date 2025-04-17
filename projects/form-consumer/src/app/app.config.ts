@@ -14,8 +14,8 @@ const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   required: () => `This field is required (Custom)`,
   requiredTrue: () => `This field is required (Custom)`,
   email: () => `It should be a valid email (Custom)`,
-  minlength: ({ requiredLength }) =>
-    `The length should be at least ${requiredLength} characters (Custom)`,
+  minlength: ({ requiredLength, actualLength }) =>
+    `The length should be at least ${requiredLength} characters but the actual length is ${actualLength}`,
   banWords: ({ bannedWord }) =>
     `The word "${bannedWord}" isn't allowed (Custom)`,
   appBanWords: ({ bannedWord }) =>
@@ -25,6 +25,7 @@ const ERROR_MESSAGES: { [key: string]: (args?: any) => string } = {
   pattern: () => `Wrong format (Custom)`,
   appUniqueNickname: () => `Nickname is taken (Custom)`,
   uniqueName: ({ name }) => `Nickname "${name}" is taken`,
+  passwordMatching: () => `Password is not match with Confirm Password`,
 };
 
 export const appConfig: ApplicationConfig = {

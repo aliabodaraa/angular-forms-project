@@ -97,19 +97,15 @@ export class DynamicArrayComponent extends BaseDynamicControl {
 
   override ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);
-    if (changes['config']?.currentValue?.controls) {
-      this.arrayControls = changes['config']?.currentValue?.controls;
+    const arrayCtrls =
+      changes['config']?.currentValue?.controls ||
+      changes['value']?.currentValue;
+    if (arrayCtrls?.length) {
+      this.arrayControls = this.configArray?.controls;
       this.lastOrder = this.arrayControls.length ?? 0;
       this.isAddable = this.configArray.isAddable ?? this.isAddable;
       this.isRemovable = this.configArray?.isRemovable ?? this.isRemovable;
     }
-  }
-
-  override ngOnInit(): void {
-    super.ngOnInit();
-    this.formControl.valueChanges.subscribe((values) => {
-      console.log(values);
-    });
   }
 
   addCtrl() {
